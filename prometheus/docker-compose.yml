@@ -1,0 +1,248 @@
+version: "3.3"
+
+networks:
+  net:
+    driver: overlay
+    attachable: true
+
+volumes:
+    prometheus: {}
+    grafana: {}
+    alertmanager: {}
+
+configs:
+  # caddy_config:
+  #   file: ./caddy/Caddyfile
+  # dockerd_config:
+  #   file: ./dockerd-exporter/Caddyfile
+  node_rules:
+    file: ./prometheus/rules/swarm_node.rules.yml
+  task_rules:
+    file: ./prometheus/rules/swarm_task.rules.yml
+  grafana_datasource:
+    file: ./grafana/datasources/prometheus.yaml
+  grafana_provisioning_dashboards:
+    file: ./grafana/swarmprom_dashboards.yml
+  grafana_dashboards_nodes:
+    file: ./grafana/dashboards/swarmprom-nodes-dash.json
+  grafana_dashboards_prometheus:
+    file: ./grafana/dashboards/swarmprom-prometheus-dash.json
+  grafana_dashboards_services:
+    file: ./grafana/dashboards/swarmprom-services-dash.json
+  alert_manager:
+    file: ./alertmanager/conf/alertmanager.yml
+  prometheus:
+    file: ./prometheus/conf/prometheus.yml
+
+services:
+  # dockerd-exporter:
+  #   image: stefanprodan/caddy
+  #   networks:
+  #     - net
+  #   environment:
+  #     - DOCKER_GWBRIDGE_IP=172.18.0.1
+  #   configs:
+  #     - source: dockerd_config
+  #       target: /etc/caddy/Caddyfile
+  #   deploy:
+  #     mode: global
+  #     resources:
+  #       limits:
+  #         memory: 128M
+  #       reservations:
+  #         memory: 64M
+
+  cadvisor:
+    image: budry/cadvisor-arm
+    networks:
+      - net
+    command: -logtostderr -docker_only
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /:/rootfs:ro
+      - /var/run:/var/run
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    ports:
+      - 9094:8080
+    deploy:
+      mode: global
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+
+  grafana:
+    image: grafana/grafana
+    networks:
+      - net
+    environment:
+      - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning/
+      #- GF_SERVER_ROOT_URL=${GF_SERVER_ROOT_URL:-localhost}
+      #- GF_SMTP_ENABLED=${GF_SMTP_ENABLED:-false}
+      #- GF_SMTP_FROM_ADDRESS=${GF_SMTP_FROM_ADDRESS:-grafana@test.com}
+      #- GF_SMTP_FROM_NAME=${GF_SMTP_FROM_NAME:-Grafana}
+      #- GF_SMTP_HOST=${GF_SMTP_HOST:-smtp:25}
+      #- GF_SMTP_USER=${GF_SMTP_USER}
+      #- GF_SMTP_PASSWORD=${GF_SMTP_PASSWORD}
+    volumes:
+      - grafana:/var/lib/grafana
+    configs:
+      - source: grafana_datasource
+        target: /etc/grafana/provisioning/datasources/prometheus.yaml
+      - source: grafana_provisioning_dashboards
+        target: /etc/grafana/provisioning/dashboards/swarmprom_dashboards.yml
+      - source: grafana_dashboards_nodes
+        target: /etc/grafana/dashboards/swarmprom-nodes-dash.json
+      - source: grafana_dashboards_prometheus
+        target: /etc/grafana/dashboards/swarmprom-prometheus-dash.json
+      - source: grafana_dashboards_services
+        target: /etc/grafana/dashboards/swarmprom-services-dash.json        
+    ports:
+      - 3000:3000
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+
+  alertmanager:
+    image: prom/alertmanager
+    networks:
+      - net
+    environment:
+      - SLACK_URL=${SLACK_URL:-https://hooks.slack.com/services/TOKEN}
+      - SLACK_CHANNEL=${SLACK_CHANNEL:-general}
+      - SLACK_USER=${SLACK_USER:-alertmanager}
+    configs:
+      - source: alert_manager
+        target: /etc/alertmanager/alertmanager.yml
+    # command:
+    #   - '--config.file=/etc/alertmanager/alertmanager.yml'
+    #   - '--storage.path=/alertmanager'
+    ports:
+      - 9093:9093
+    volumes:
+      - alertmanager:/alertmanager
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+
+  # unsee:
+  #   image: cloudflare/unsee:v0.8.0
+  #   networks:
+  #     - net
+  #   environment:
+  #     - "ALERTMANAGER_URIS=default:http://alertmanager:9093"
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+
+  node-exporter:
+    image: jmb12686/swarmprom-node-exporter:latest 
+    networks:
+      - net
+    environment:
+      - NODE_ID={{.Node.ID}}
+    ports:
+      - 9100:9100
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+      - /etc/hostname:/etc/nodename:ro
+    command:
+      - '--path.sysfs=/host/sys'
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--collector.textfile.directory=/etc/node-exporter/' 
+      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+      - '--no-collector.ipvs'
+    deploy:
+      mode: global
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+
+  prometheus:
+    image: prom/prometheus
+    networks:
+      - net
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention=${PROMETHEUS_RETENTION:-24h}'
+    volumes:
+      - prometheus:/prometheus
+    configs:
+      - source: prometheus
+        target: /etc/prometheus/prometheus.yml  
+      - source: node_rules
+        target: /etc/prometheus/swarm_node.rules.yml
+      - source: task_rules
+        target: /etc/prometheus/swarm_task.rules.yml
+    ports:
+      - 9090:9090
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          memory: 2048M
+        reservations:
+          memory: 1048M
+
+  # caddy:
+  #   image: stefanprodan/caddy
+  #   ports:
+  #     - "3000:3000"
+  #     - "9090:9090"
+  #     - "9093:9093"
+  #     - "9094:9094" #This is for cAdvisor
+  #   networks:
+  #     - net
+  #   environment:
+  #     - ADMIN_USER=${ADMIN_USER:-admin}
+  #     - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+  #   configs:
+  #     - source: caddy_config
+  #       target: /etc/caddy/Caddyfile
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #     placement:
+  #       constraints:
+  #         - node.role == manager
+  #     resources:
+  #       limits:
+  #         memory: 128M
+  #       reservations:
+  #         memory: 64M
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:3000"]
+  #     interval: 5s
+  #     timeout: 1s
+  #     retries: 5

@@ -51,6 +51,18 @@ services:
   #         memory: 128M
   #       reservations:
   #         memory: 64M
+  dockerd-exporter:
+    image: jmb12686/socat
+    networks:
+      - net
+    command: -d -d TCP-L:9323,fork TCP:172.18.0.1:9323
+    deploy:
+      mode: global
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
 
   cadvisor:
     image: budry/cadvisor-arm

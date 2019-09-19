@@ -1,6 +1,7 @@
 groups:
 - name: /1/store/projects/vagrant/docker-swarm-vagrant/apps/swarmprom/prometheus/rules/swarm_node.rules.yml
   rules:
+  ##count(count(container_tasks_state{container_label_com_docker_swarm_node_id =~".+"}) by (container_label_com_docker_swarm_node_id)) < 3
   ##count(node_meta * on(instance) group_left(node_name) node_meta{node_id=~".+"}) < 3
   - alert: less_than_3_nodes
     expr: count(node_meta * on(instance) group_left(node_name) node_meta{node_id=~".+"}) < 3

@@ -1,4 +1,4 @@
-# RaspberryPi Docker Swarm Stcks
+# RaspberryPi Docker Swarm Stacks
 A collection of Docker Stacks that I run on my home Raspberry Pi Docker Swarm cluster.  
 
 ## Setup and Install

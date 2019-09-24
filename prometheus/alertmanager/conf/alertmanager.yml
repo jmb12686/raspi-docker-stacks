@@ -13,3 +13,11 @@ receivers:
       auth_username: "$GMAIL_ACCOUNT"
       auth_password: "$GMAIL_AUTH_TOKEN"
       text: "{{ .CommonAnnotations.description }}"
+    - send_resolved: true
+      to: $EMAIL_TO_ACCOUNT_2
+      from: $GMAIL_ACCOUNT
+      smarthost: smtp.gmail.com:587
+      auth_identity: "$GMAIL_ACCOUNT"
+      auth_username: "$GMAIL_ACCOUNT"
+      auth_password: "$GMAIL_AUTH_TOKEN"
+      text: "{{ .CommonAnnotations.description }}"      

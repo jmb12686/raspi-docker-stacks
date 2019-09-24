@@ -20,6 +20,11 @@ services:
       mode: global
       placement:
         constraints: [node.platform.os == linux]
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M        
 
   portainer:
     image: portainer/portainer
@@ -36,6 +41,11 @@ services:
       replicas: 1
       placement:
         constraints: [node.role == manager]
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
 
 networks:
   agent_network:

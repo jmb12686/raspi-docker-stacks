@@ -1,0 +1,63 @@
+version: "3.7"
+
+# https://github.com/pi-hole/docker-pi-hole/blob/master/README.md
+
+services:
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    deploy:
+      replicas: 2
+      update_config:
+        delay: 30s
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 100M
+    # For DHCP it is recommended to remove these ports and instead add: network_mode: "host"
+    ports:
+      - target: 53
+        published: 53
+        protocol: tcp
+      - target: 53
+        published: 53
+        protocol: udp
+      - target: 67
+        published: 67
+        protocol: udp
+      - target: 80
+        published: 80
+        protocol: tcp
+      - target: 443
+        published: 443
+        protocol: tcp
+    environment:
+      TZ: 'America/New_York'
+      #WEBPASSWORD: ''
+      DNS_FQDN_REQUIRED: 'true'
+      DNS_BOGUS_PRIV: 'true'
+      DNSSEC: 'false'
+      CONDITIONAL_FORWARDING: 'true'
+      CONDITIONAL_FORWARDING_IP: '192.168.0.1'
+      CONDITIONAL_FORWARDING_DOMAIN: 'home.local'
+      CONDITIONAL_FORWARDING_REVERSE: '0.168.192.in-addr.arpa'
+    # Volumes store your data between container upgrades
+    volumes:
+       - etc-pihole:/etc/pihole/
+       - etc-dnsmasq.d:/etc/dnsmasq.d/
+    # run `touch ./var-log/pihole.log` first unless you like errors
+       - var-log:/var/log/
+    dns:
+      - 127.0.0.1
+      - 1.1.1.1
+    # Recommended but not required (DHCP needs NET_ADMIN)
+    #   https://github.com/pi-hole/docker-pi-hole#note-on-capabilities
+    cap_add:
+      - NET_ADMIN
+    restart: unless-stopped
+volumes:
+  etc-pihole: {}
+  etc-dnsmasq.d: {}
+  var-log: {}
+  

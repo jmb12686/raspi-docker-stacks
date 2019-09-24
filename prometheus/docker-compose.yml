@@ -11,10 +11,6 @@ volumes:
     alertmanager: {}
 
 configs:
-  # caddy_config:
-  #   file: ./caddy/Caddyfile
-  # dockerd_config:
-  #   file: ./dockerd-exporter/Caddyfile
   node_rules:
     file: ./prometheus/rules/swarm_node.rules.yml
   task_rules:
@@ -30,27 +26,11 @@ configs:
   grafana_dashboards_services:
     file: ./grafana/dashboards/swarmprom-services-dash.json
   alert_manager:
-    file: ./alertmanager/conf/alertmanager.yml
+    file: ./alertmanager/conf/prod.alertmanager.yml
   prometheus:
     file: ./prometheus/conf/prometheus.yml
 
 services:
-  # dockerd-exporter:
-  #   image: stefanprodan/caddy
-  #   networks:
-  #     - net
-  #   environment:
-  #     - DOCKER_GWBRIDGE_IP=172.18.0.1
-  #   configs:
-  #     - source: dockerd_config
-  #       target: /etc/caddy/Caddyfile
-  #   deploy:
-  #     mode: global
-  #     resources:
-  #       limits:
-  #         memory: 128M
-  #       reservations:
-  #         memory: 64M
   dockerd-exporter:
     image: jmb12686/socat
     networks:
@@ -158,16 +138,6 @@ services:
         reservations:
           memory: 64M
 
-  # unsee:
-  #   image: cloudflare/unsee:v0.8.0
-  #   networks:
-  #     - net
-  #   environment:
-  #     - "ALERTMANAGER_URIS=default:http://alertmanager:9093"
-  #   deploy:
-  #     mode: replicated
-  #     replicas: 1
-
   node-exporter:
     image: jmb12686/swarmprom-node-exporter:latest 
     networks:
@@ -226,35 +196,3 @@ services:
           memory: 2048M
         reservations:
           memory: 1048M
-
-  # caddy:
-  #   image: stefanprodan/caddy
-  #   ports:
-  #     - "3000:3000"
-  #     - "9090:9090"
-  #     - "9093:9093"
-  #     - "9094:9094" #This is for cAdvisor
-  #   networks:
-  #     - net
-  #   environment:
-  #     - ADMIN_USER=${ADMIN_USER:-admin}
-  #     - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
-  #   configs:
-  #     - source: caddy_config
-  #       target: /etc/caddy/Caddyfile
-  #   deploy:
-  #     mode: replicated
-  #     replicas: 1
-  #     placement:
-  #       constraints:
-  #         - node.role == manager
-  #     resources:
-  #       limits:
-  #         memory: 128M
-  #       reservations:
-  #         memory: 64M
-  #   healthcheck:
-  #     test: ["CMD", "curl", "-f", "http://localhost:3000"]
-  #     interval: 5s
-  #     timeout: 1s
-  #     retries: 5

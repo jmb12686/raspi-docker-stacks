@@ -121,6 +121,8 @@ services:
         target: /etc/alertmanager/alertmanager.yml
     command:
       - "--web.external-url=http://raspberrypi-delta.home.local:9093"
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
     ports:
       - 9093:9093
     volumes:

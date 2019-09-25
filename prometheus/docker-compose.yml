@@ -119,9 +119,8 @@ services:
     configs:
       - source: alert_manager
         target: /etc/alertmanager/alertmanager.yml
-    # command:
-    #   - '--config.file=/etc/alertmanager/alertmanager.yml'
-    #   - '--storage.path=/alertmanager'
+    command:
+      - "--web.external-url=http://raspberrypi-delta.home.local:9093"
     ports:
       - 9093:9093
     volumes:

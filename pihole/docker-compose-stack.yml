@@ -32,23 +32,24 @@ services:
         published: 443
         protocol: tcp
     environment:
-      TZ: 'America/New_York'
-      #WEBPASSWORD: ''
-      DNS_FQDN_REQUIRED: 'true'
-      DNS_BOGUS_PRIV: 'true'
-      DNSSEC: 'false'
-      CONDITIONAL_FORWARDING: 'true'
-      CONDITIONAL_FORWARDING_IP: '192.168.0.1'
-      CONDITIONAL_FORWARDING_DOMAIN: 'home.local'
-      CONDITIONAL_FORWARDING_REVERSE: '0.168.192.in-addr.arpa'
+      TZ: "America/New_York"
+      WEBPASSWORD: ${PIHOLE_WEBPASSWORD}
+      DNS1: "172.18.0.1#5053"
+      DNS_FQDN_REQUIRED: "true"
+      DNS_BOGUS_PRIV: "true"
+      DNSSEC: "false"
+      CONDITIONAL_FORWARDING: "true"
+      CONDITIONAL_FORWARDING_IP: "192.168.0.1"
+      CONDITIONAL_FORWARDING_DOMAIN: "home.local"
+      CONDITIONAL_FORWARDING_REVERSE: "0.168.192.in-addr.arpa"
     # Volumes store your data between container upgrades
     volumes:
-       - etc-pihole:/etc/pihole/
-       - etc-dnsmasq.d:/etc/dnsmasq.d/
-    # run `touch ./var-log/pihole.log` first unless you like errors
-       - var-log:/var/log/
+      - etc-pihole:/etc/pihole/
+      - etc-dnsmasq.d:/etc/dnsmasq.d/
+      # run `touch ./var-log/pihole.log` first unless you like errors
+      - var-log:/var/log/
     dns:
-      - "172.18.0.1#5053"
+      - "127.0.0.1"
       - "1.1.1.1" # fallback
 
   cloudflared:
@@ -67,4 +68,3 @@ volumes:
   etc-pihole: {}
   etc-dnsmasq.d: {}
   var-log: {}
-  

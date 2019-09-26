@@ -4,7 +4,6 @@ version: "3.7"
 
 services:
   pihole:
-    container_name: pihole
     image: pihole/pihole:latest
     deploy:
       replicas: 2
@@ -54,6 +53,13 @@ services:
 
   cloudflared:
     image: crazymax/cloudflared:latest
+    ports:
+      - target: 5053
+        published: 5053
+        protocol: udp
+      - target: 49312
+        published: 49312
+        protocol: tcp
     environment:
       - "TZ=America/New_York"
       - "TUNNEL_DNS_UPSTREAM=https://1.1.1.1/dns-query,https://1.0.0.1/dns-query"

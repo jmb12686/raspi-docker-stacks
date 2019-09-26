@@ -33,7 +33,7 @@ services:
         protocol: tcp
     environment:
       TZ: "America/New_York"
-      WEBPASSWORD: ${PIHOLE_WEBPASSWORD}
+      WEBPASSWORD: "${PIHOLE_WEBPASSWORD:?err}"
       DNS1: "172.18.0.1#5053"
       DNS_FQDN_REQUIRED: "true"
       DNS_BOGUS_PRIV: "true"

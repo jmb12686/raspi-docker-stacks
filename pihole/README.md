@@ -14,7 +14,7 @@
 2. On a Docker Swarm Manager node, run:
     ```bash
     PIHOLE_WEBPASSWORD=admin \
-    $ docker stack deploy --compose-file=docker-compose-stack.yml pihole
+    && sudo docker stack deploy --compose-file=docker-compose-stack.yml pihole
     ```
 
 3. You may want to add hostrecords to dnsmasq, run the following against each pihole container / node:

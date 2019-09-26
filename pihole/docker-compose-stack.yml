@@ -49,12 +49,22 @@ services:
     # run `touch ./var-log/pihole.log` first unless you like errors
        - var-log:/var/log/
     dns:
-      - 127.0.0.1
-      - 1.1.1.1
+      - "cloudflared#5053"
+      - "1.1.1.1" # fallback
     # Recommended but not required (DHCP needs NET_ADMIN)
     #   https://github.com/pi-hole/docker-pi-hole#note-on-capabilities
     cap_add:
       - NET_ADMIN
+    restart: unless-stopped
+
+  cloudflared:
+    image: crazymax/cloudflared:latest
+    container_name: cloudflared
+    networks:
+      - pihole
+    environment:
+      - "TZ=America/New_York"
+      - "TUNNEL_DNS_UPSTREAM=https://1.1.1.1/dns-query,https://1.0.0.1/dns-query"
     restart: unless-stopped
 volumes:
   etc-pihole: {}

@@ -49,7 +49,7 @@ services:
     # run `touch ./var-log/pihole.log` first unless you like errors
        - var-log:/var/log/
     dns:
-      - "cloudflared#5053"
+      - "172.18.0.1#5053"
       - "1.1.1.1" # fallback
 
   cloudflared:

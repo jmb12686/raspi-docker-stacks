@@ -1,4 +1,4 @@
-version: '3.2'
+version: "3.2"
 
 services:
   agent:
@@ -8,6 +8,7 @@ services:
       # deployed inside an overlay network
       AGENT_CLUSTER_ADDR: tasks.agent
       CAP_HOST_MANAGEMENT: 1
+      AGENT_SECRET: ${PORTAINER_AGENT_SECRET:?err}
       # AGENT_PORT: 9001
       # LOG_LEVEL: debug
     volumes:
@@ -24,10 +25,12 @@ services:
         limits:
           memory: 128M
         reservations:
-          memory: 64M        
+          memory: 64M
 
   portainer:
     image: portainer/portainer
+    environment:
+      AGENT_SECRET: ${PORTAINER_AGENT_SECRET:?err}
     command: -H tcp://tasks.agent:9001 --tlsskipverify
     ports:
       - "9000:9000"

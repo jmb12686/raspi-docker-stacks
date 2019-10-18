@@ -5,6 +5,7 @@ version: "3.7"
 services:
   pihole:
     image: pihole/pihole:latest
+    hostname: "{{.Node.Hostname}}-{{.Task.ID}}"    
     deploy:
       replicas: 2
       update_config:
@@ -35,6 +36,7 @@ services:
       TZ: "America/New_York"
       WEBPASSWORD: "${PIHOLE_WEBPASSWORD:?err}"
       DNS1: "172.18.0.1#5053"
+      DNS2: "172.18.0.1#5053"
       DNS_FQDN_REQUIRED: "true"
       DNS_BOGUS_PRIV: "true"
       DNSSEC: "false"

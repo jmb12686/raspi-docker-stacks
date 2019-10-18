@@ -56,6 +56,10 @@ services:
 
   cloudflared:
     image: crazymax/cloudflared:latest
+    deploy:
+      replicas: 2
+      update_config:
+        delay: 30s    
     ports:
       - target: 5053
         published: 5053

@@ -140,7 +140,7 @@ services:
           memory: 64M
 
   node-exporter:
-    image: jmb12686/swarmprom-node-exporter:latest 
+    image: jmb12686/node-exporter:latest 
     networks:
       - net
     environment:

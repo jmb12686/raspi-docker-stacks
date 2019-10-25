@@ -59,6 +59,9 @@ services:
       - 9094:8080
     deploy:
       mode: global
+      placement:
+        constraints:
+          - node.platform.arch == armv7l
       resources:
         limits:
           memory: 128M

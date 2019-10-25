@@ -66,7 +66,7 @@ services:
           memory: 64M
 
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:6.3.6
     networks:
       - net
     environment:

@@ -38,6 +38,9 @@ services:
     command: -d -d TCP-L:9323,fork TCP:172.18.0.1:9323
     deploy:
       mode: global
+      placement:
+        constraints:
+          - node.platform.arch == armv7l      
       resources:
         limits:
           memory: 128M
@@ -45,7 +48,7 @@ services:
           memory: 64M
 
   cadvisor:
-    image: budry/cadvisor-arm
+    image: jmb12686/cadvisor
     networks:
       - net
     command: -logtostderr -docker_only
@@ -59,9 +62,6 @@ services:
       - 9094:8080
     deploy:
       mode: global
-      placement:
-        constraints:
-          - node.platform.arch == armv7l
       resources:
         limits:
           memory: 128M
@@ -164,6 +164,9 @@ services:
       - '--no-collector.ipvs'
     deploy:
       mode: global
+      placement:
+        constraints:
+          - node.platform.arch == armv7l      
       resources:
         limits:
           memory: 128M

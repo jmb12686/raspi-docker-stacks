@@ -20,6 +20,14 @@ groups:
     annotations:
       description: Number of Swarm nodes is less than 3, check setup to maintain a quorum.
       summary: Swarm node went down, check setup.
+  - alert: less_than_3_swarm_managers
+    expr: sum(swarm_node_manager) < 3
+    for: 5m
+    labels:
+      severity: error
+    annotations:
+      description: Number of Swarm Manager Nodes is less than 3!!!  Check cluster to maintain a quorum!
+      summary: Swarm Manager Node went down, check cluster health.
   - alert: node_cpu_usage
     expr: 100 - (avg(irate(node_cpu_seconds_total{mode="idle"}[1m]) * ON(instance) GROUP_LEFT(node_name)
       node_meta * 100) BY (node_name)) > 50

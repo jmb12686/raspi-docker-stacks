@@ -143,7 +143,7 @@ services:
           memory: 64M
 
   node-exporter:
-    image: jmb12686/node-exporter:latest 
+    image: jmb12686/node-exporter 
     networks:
       - net
     environment:
@@ -164,14 +164,9 @@ services:
       - '--no-collector.ipvs'
     deploy:
       mode: global
-      placement:
-        constraints:
-          - node.platform.arch == armv7l      
       resources:
         limits:
-          memory: 128M
-        reservations:
-          memory: 64M
+          memory: 32M
 
   prometheus:
     image: prom/prometheus

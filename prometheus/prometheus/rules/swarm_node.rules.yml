@@ -12,6 +12,14 @@ groups:
     annotations:
       description: pihole service containers are missing and may be down.  Check status of home DNS setup!
       summary: pihole containers are missing
+  - alert: piholeMissingNew
+    expr: (count(time() - container_last_seen{name=~".*pihole_pihole.*"} < 30) OR vector(0)) < 2
+    for: 5s
+    labels:
+      severity: error
+    annotations:
+      description: Less than 2 pihole containers exist!  Check status of home DNS setup!
+      summary: pihole container missing
   - alert: less_than_3_nodes
     expr: count(node_meta * on(instance) group_left(node_name) node_meta{node_id=~".+"}) < 3
     for: 5m

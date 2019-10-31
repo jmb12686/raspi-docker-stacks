@@ -29,8 +29,28 @@ configs:
     file: ./alertmanager/conf/prod.alertmanager.yml
   prometheus:
     file: ./prometheus/conf/prometheus.yml
+  blackbox_exporter:
+    file: ./blackbox-exporter/blackbox.yml
+  
+    
 
 services:
+  doh-status-probe:
+    image: prom/blackbox-exporter
+    networks:
+      - net
+    command:
+      - '--config.file=/config/blackbox.yml'
+    configs:
+      - source: blackbox_exporter
+        target: /config/blackbox.yml      
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          memory: 32M
+
   dockerd-exporter:
     image: jmb12686/socat
     networks:

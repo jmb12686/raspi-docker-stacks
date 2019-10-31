@@ -1,0 +1,38 @@
+# http://localhost:9115/probe?target=https://bbd96f23-eda8-465d-b190-6ddf056cae66.is-dot.cloudflareresolve.com/resolvertest&module=http_2xx
+# http://localhost:9115/probe?target=https://bbd96f23-eda8-465d-b190-6ddf056cae66.is-dot.cloudflareresolve.com/resolvertest&module=http_2xx_example
+modules:
+  http_2xx_expect_1:
+    prober: http
+    timeout: 5s
+    http:
+      valid_http_versions: ["HTTP/1.1", "HTTP/2"]
+      valid_status_codes: []  # Defaults to 2xx
+      method: GET
+      # headers:
+      #   Host: vhost.example.com
+      #   Accept-Language: en-US
+      #   Origin: example.com
+      # no_follow_redirects: false
+      # fail_if_ssl: false
+      # fail_if_not_ssl: false
+      # fail_if_body_matches_regexp:
+        # - "Could not connect to database"
+      fail_if_body_not_matches_regexp:
+        - "^1$"
+      preferred_ip_protocol: "ip4" # defaults to "ip6"
+      ip_protocol_fallback: false  # no fallback to "ip6"        
+      # fail_if_header_matches: # Verifies that no cookies are set
+      #   - header: Set-Cookie
+      #     allow_missing: true
+      #     regexp: '.*'
+      # fail_if_header_not_matches:
+      #   - header: Access-Control-Allow-Origin
+      #     regexp: '(\*|example\.com)'
+      # tls_config:
+      #   insecure_skip_verify: false
+      # preferred_ip_protocol: "ip4" # defaults to "ip6"
+      # ip_protocol_fallback: false  # no fallback to "ip6"
+
+
+
+# curl 'https://bbd96f23-eda8-465d-b190-6ddf056cae66.is-doh.cloudflareresolve.com/resolvertest' -H 'Accept: */*' -H 'Referer: https://www.cloudflare.com/ssl/encrypted-sni/' -H 'Origin: https://www.cloudflare.com' -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36' -H 'DNT: 1' -H 'Sec-Fetch-Mode: cors' --compressed

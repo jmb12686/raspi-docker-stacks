@@ -17,14 +17,19 @@
     $ sudo -E bash -c 'docker stack deploy --compose-file=docker-compose-stack.yml pihole'
     ```
 
-3. You may want to add hostrecords to dnsmasq, run the following against each pihole container / node:
+3. To change temperature to fahrenheit, run the following against each pihole container.  This setting is persisted in the docker volume:
+    ```sh
+    docker exec PIHOLE_CONTAINER_NAME pihole -a fahrenheit
+    ```
+4. You may want to add hostrecords to dnsmasq, run the following against each pihole container / node:
     ```sh
     docker exec PIHOLE_CONTAINER_NAME pihole -a hostrecord my.custom.dns.entry 192.168.X.X
     ```
     These records are persisted in the dnsmasq docker volume.
 
+
 ### Future TODOs:
-* Modify / override the pihole service `command` and/or `entrypoint` to add custom hostrecords within the container upon startup / creation:
+* Modify / override the pihole service `command` and/or `entrypoint` to add custom pihole commands, hostrecords, etc within the container upon startup / creation:
     ```bash
     pihole -a hostrecord router.belisleonline.com 192.168.0.1
     ```

@@ -118,7 +118,7 @@ services:
       - source: alert_manager
         target: /etc/alertmanager/alertmanager.yml
     command:
-      - "--web.external-url=http://raspberrypi-delta.home.local:9093"
+      - "--web.external-url=http://raspi-swarm.home.local:9093"
       - '--config.file=/etc/alertmanager/alertmanager.yml'
       - '--storage.path=/alertmanager'
     ports:

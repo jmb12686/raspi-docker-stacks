@@ -1,1 +1,2 @@
 prometheus/alertmanager/conf/prod.alertmanager.yml
+htpasswd

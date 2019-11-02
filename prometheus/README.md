@@ -32,6 +32,7 @@ Services:
 * node-exporter (host metrics collector)
 * cadvisor (containers metrics collector)
 * dockerd-exporter (Docker daemon metrics collector, requires Docker experimental metrics-addr to be enabled)
+* blackbox-exporter (probe arbitrary http/https/dns/icmp/ssh endpoints to monitor status)
 * alertmanager (alerts dispatcher) `http://<swarm-ip>:9093`
 
 ### custom multiarch node-exporter
@@ -96,3 +97,9 @@ Assuming the filter is `$node_id` the container count query should look like thi
 ```
 count(rate(container_last_seen{container_label_com_docker_swarm_node_id=~"$node_id"}[5m]))
 ```
+
+## Additional Alerting and PromQL resources
+* A decent list of alerts for a variety to prometheus exporters is available:
+https://awesome-prometheus-alerts.grep.to/rules.html
+* PromQL documentation: https://prometheus.io/docs/prometheus/latest/querying/basics/
+

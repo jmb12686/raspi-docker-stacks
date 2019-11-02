@@ -4,6 +4,9 @@ networks:
   net:
     driver: overlay
     attachable: true
+  # traefik-public:
+  #   driver: overlay
+    # external: true
 
 volumes:
     prometheus: {}
@@ -31,10 +34,54 @@ configs:
     file: ./prometheus/conf/prometheus.yml
   blackbox_exporter:
     file: ./blackbox-exporter/blackbox.yml
+  traefik_htpasswd:
+    file: ./traefik/htpasswd
   
     
 
 services:
+  traefik:
+    image: traefik:v1.7.19-alpine
+    ports:
+      - target: 80
+        published: 8080
+        # mode: host
+      - target: 443
+        published: 4433
+        # mode: host
+      - target: 8080
+        published: 8181
+        # you can view the traefik's dashboard in http://swarmIP:8080
+    command: >
+      --api
+      --docker
+      --docker.swarmMode
+      --docker.domain=${DOMAIN:-docker.localhost}
+      --docker.watch
+      --defaultentrypoints=http
+      --entrypoints='Name:http Address::80'
+      --entrypoints='Name:https Address::443 TLS'
+      --logLevel=INFO
+      --accessLog
+      --metrics
+      --metrics.prometheus
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    configs:
+      - source: traefik_htpasswd
+        target: /etc/htpasswd
+    networks:
+      # - traefik-public
+      - net
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      update_config:
+        parallelism: 1
+        delay: 10s
   doh-status-probe:
     image: prom/blackbox-exporter
     networks:
@@ -112,14 +159,18 @@ services:
         target: /etc/grafana/dashboards/swarmprom-prometheus-dash.json
       - source: grafana_dashboards_services
         target: /etc/grafana/dashboards/swarmprom-services-dash.json        
-    ports:
-      - 3000:3000
     deploy:
       mode: replicated
       replicas: 1
       placement:
         constraints:
           - node.role == manager
+      labels:
+        - "traefik.backend=grafana"
+        - "traefik.port=3000"
+        - "traefik.docker.network=mon_net"
+        - "traefik.entrypoints=http"
+        - "traefik.frontend.rule=Host:grafana.home.local"                 
       resources:
         limits:
           memory: 128M
@@ -141,8 +192,6 @@ services:
       - "--web.external-url=http://raspi-swarm.home.local:9093"
       - '--config.file=/etc/alertmanager/alertmanager.yml'
       - '--storage.path=/alertmanager'
-    ports:
-      - 9093:9093
     volumes:
       - alertmanager:/alertmanager
     deploy:
@@ -151,6 +200,12 @@ services:
       placement:
         constraints:
           - node.role == manager
+      labels:
+        - "traefik.backend=alertmanager"
+        - "traefik.port=9093"
+        - "traefik.docker.network=mon_net"
+        - "traefik.entrypoints=http"
+        - "traefik.frontend.rule=Host:alertmanager.home.local"                 
       resources:
         limits:
           memory: 128M
@@ -189,6 +244,8 @@ services:
       - net
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
+      # - '--web.route-prefix=/prometheus/'
+      # - '--web.external-url=http://raspi-swarm.home.local/prometheus'
       - '--storage.tsdb.path=/prometheus'
       - '--storage.tsdb.retention=${PROMETHEUS_RETENTION:-72h}'
     volumes:
@@ -200,14 +257,22 @@ services:
         target: /etc/prometheus/swarm_node.rules.yml
       - source: task_rules
         target: /etc/prometheus/swarm_task.rules.yml
-    ports:
-      - 9090:9090
+      - source: traefik_htpasswd
+        target: /etc/htpasswd        
     deploy:
       mode: replicated
       replicas: 1
       placement:
         constraints:
           - node.role == manager
+      labels:
+        - "traefik.backend=prometheus"
+        - "traefik.port=9090" #Prometheus port to register
+        - "traefik.docker.network=mon_net"
+        # - "traefik.backend=net"
+        - "traefik.entrypoints=http"
+        - "traefik.frontend.rule=Host:prometheus.home.local"    
+        # - "traefik.frontend.auth.basic.usersFile=/etc/htpasswd"             
       resources:
         limits:
           memory: 2048M

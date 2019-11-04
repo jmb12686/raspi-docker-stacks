@@ -11,10 +11,15 @@ rule_files:
 
 alerting:
   alertmanagers:
-  - static_configs:
-    - targets:
-      - alertmanager:9093
-      - alertmanager-2:9093
+    - dns_sd_configs:
+      - names:
+        - 'tasks.alertmanager'
+        type: 'A'
+        port: 9093  
+  # - static_configs:
+  #   - targets:
+  #     - alertmanager:9093
+  #     - alertmanager-2:9093
     # - dns_sd_configs:
     #   - names:
     #     - 'tasks.alertmanager'

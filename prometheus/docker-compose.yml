@@ -142,8 +142,8 @@ services:
       - '--config.file=/etc/alertmanager/alertmanager.yml'
       - '--storage.path=/alertmanager'
       - '--cluster.listen-address=0.0.0.0:8001'
-      - '--cluster.peer=tasks.alertmanager-2:8001' 
-      - '--log.level=debug'     
+      - '--cluster.peer=tasks.alertmanager:8001'      
+      # - '--log.level=debug'     
       # - '--cluster.advertise-address=' --> This arg gets set in the jmb12686/alertmanager-swarm image entry-point script.      
                                            # It effectively gets set to the eth1 interface IP @ port 8001 to support Swarm networking  
     ports:
@@ -152,43 +152,7 @@ services:
       - alertmanager:/alertmanager
     deploy:
       mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
-      resources:
-        limits:
-          memory: 128M
-        reservations:
-          memory: 64M
-
-  alertmanager-2:
-    image: jmb12686/alertmanager-swarm
-    networks:
-      - net
-    environment:
-      - SLACK_URL=${SLACK_URL:-https://hooks.slack.com/services/TOKEN}
-      - SLACK_CHANNEL=${SLACK_CHANNEL:-general}
-      - SLACK_USER=${SLACK_USER:-alertmanager}
-    configs:
-      - source: alert_manager
-        target: /etc/alertmanager/alertmanager.yml
-    command:
-      - "--web.external-url=http://raspi-swarm.home.local:9093"
-      - '--config.file=/etc/alertmanager/alertmanager.yml'
-      - '--storage.path=/alertmanager'
-      - '--cluster.listen-address=0.0.0.0:8001'
-      - '--cluster.peer=alertmanager:8001'      
-      - '--log.level=debug'      
-      # - '--cluster.advertise-address=' --> This arg gets set in the jmb12686/alertmanager-swarm image entry-point script.      
-                                           # This gets set to the eth1 interface IP @ port 8001 to support Swarm networking       
-    ports:
-      - 9092:9093
-    volumes:
-      - alertmanager:/alertmanager
-    deploy:
-      mode: replicated
-      replicas: 1
+      replicas: 2
       placement:
         constraints:
           - node.role == manager

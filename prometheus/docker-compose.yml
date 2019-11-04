@@ -127,7 +127,7 @@ services:
           memory: 64M
 
   alertmanager:
-    image: prom/alertmanager
+    image: jmb12686/alertmanager-swarm
     networks:
       - net
     environment:
@@ -141,13 +141,18 @@ services:
       - "--web.external-url=http://raspi-swarm.home.local:9093"
       - '--config.file=/etc/alertmanager/alertmanager.yml'
       - '--storage.path=/alertmanager'
+      - '--cluster.listen-address=0.0.0.0:8001'
+      - '--cluster.peer=tasks.alertmanager:8001'      
+      # - '--log.level=debug'     
+      # - '--cluster.advertise-address=' --> This arg gets set in the jmb12686/alertmanager-swarm image entry-point script.      
+                                           # It effectively gets set to the eth1 interface IP @ port 8001 to support Swarm networking  
     ports:
       - 9093:9093
     volumes:
       - alertmanager:/alertmanager
     deploy:
       mode: replicated
-      replicas: 1
+      replicas: 2
       placement:
         constraints:
           - node.role == manager

@@ -1,0 +1,63 @@
+version: "3.7"
+
+# networks:
+#   net:
+#     driver: overlay
+#     attachable: true
+
+volumes:
+    gitlab-data: {}
+    gitlab-logs: {}
+    gitlab-config: {}
+    gitlab-runner-config: {}
+
+configs:
+  gitlab:
+    file: ./gitlab.rb
+  # gitlab-runner:
+  #   file: ./runner-config.tml
+secrets:
+  gitlab_root_password:
+    file: ./root_password.txt
+
+services:
+  gitlab:
+    image: ulm0/gitlab:12.3.0
+    # networks:
+    #   - net    
+    ports:
+      - 222:22
+      - 88:88
+      - 4433:443
+    volumes:
+      - gitlab-data:/var/opt/gitlab
+      - gitlab-logs:/var/log/gitlab
+      - gitlab-config:/etc/gitlab
+    environment:
+      GITLAB_OMNIBUS_CONFIG: "from_file('/omnibus_config.rb')"
+    configs:
+      - source: gitlab
+        target: /omnibus_config.rb
+    secrets:
+      - gitlab_root_password
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == worker
+      resources:
+        limits:
+          memory: 4000M
+        reservations:
+          memory: 2048M
+  gitlab-runner:
+    image: klud/gitlab-runner:alpine
+    # networks:
+    #   - net    
+    volumes:
+      - gitlab-runner-config:/etc/gitlab-runner
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      mode: replicated
+      replicas: 1

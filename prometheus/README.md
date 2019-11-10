@@ -96,3 +96,26 @@ Assuming the filter is `$node_id` the container count query should look like thi
 ```
 count(rate(container_last_seen{container_label_com_docker_swarm_node_id=~"$node_id"}[5m]))
 ```
+
+## Updating Configs in already deployed Stack
+This Prometheus stack utilizes many Docker Configs which are immutable.  To support hot deployment and updating of the stack with updates to config files, a versioning mechanism has been added to the Compose file:
+```yml
+configs:
+  prometheus:
+    name: prometheus-${CONFIG_VERSION:-0}
+    file: ./prometheus/conf/prometheus.yml  
+```
+
+Without the `CONFIG_VERSION` env variable set, compose defaults the config file "version" to 0.
+
+Deploying the stack with `CONFIG_VERSION=1`:
+```bash
+$ export CONFIG_VERSION=1 
+$ sudo -E bash -c 'docker stack deploy -c docker-compose.yml mon'
+Creating config prometheus-1
+Creating config alert_manager-1
+Updating service mon_prometheus (id: 2mdy9h720iofyaqort1qx1qu2)
+Updating service mon_alertmanager (id: 68sxctatkw7kwg1ywt4zcik4v)
+```
+
+Removing the Docker stack will dispose of all configs created, but there is currently no `prune` for Docker Configs, so maintenance / cleanup to remove unused configs should be periodically performed.

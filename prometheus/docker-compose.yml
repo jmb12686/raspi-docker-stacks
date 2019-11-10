@@ -1,4 +1,4 @@
-version: "3.3"
+version: "3.7"
 
 networks:
   net:
@@ -11,10 +11,15 @@ volumes:
     alertmanager: {}
 
 configs:
+  prometheus:
+    name: prometheus-${CONFIG_VERSION:-0}
+    file: ./prometheus/conf/prometheus.yml  
   node_rules:
     file: ./prometheus/rules/swarm_node.rules.yml
   task_rules:
     file: ./prometheus/rules/swarm_task.rules.yml
+  meta_rules:
+    file: ./prometheus/rules/snitch.rules.yml
   grafana_datasource:
     file: ./grafana/datasources/prometheus.yaml
   grafana_provisioning_dashboards:
@@ -26,9 +31,8 @@ configs:
   grafana_dashboards_services:
     file: ./grafana/dashboards/swarmprom-services-dash.json
   alert_manager:
+    name: alert_manager-${CONFIG_VERSION:-0}
     file: ./alertmanager/conf/prod.alertmanager.yml
-  prometheus:
-    file: ./prometheus/conf/prometheus.yml
   blackbox_exporter:
     file: ./blackbox-exporter/blackbox.yml
   
@@ -205,6 +209,8 @@ services:
         target: /etc/prometheus/swarm_node.rules.yml
       - source: task_rules
         target: /etc/prometheus/swarm_task.rules.yml
+      - source: meta_rules
+        target: /etc/prometheus/snitch.rules.yml
     ports:
       - 9090:9090
     deploy:

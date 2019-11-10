@@ -1,9 +1,22 @@
 route:
   group_by: [...]
-  receiver: 'email-me'
+  receiver: 'default-receiver'
+  # All alerts that do not match the following child routes
+  # will remain at the root node and be dispatched to 'default-receiver'.  
+  routes:
+  # All alerts with alertname=DeadMansSnitch
+  # are dispatched to the deadmanssnitch receiver webhook
+  - match:
+      alertname: DeadMansSnitch
+    receiver: deadmanssnitch
+    repeat_interval: 5m
 
 receivers:
-  - name: 'email-me'
+  - name: 'deadmanssnitch'
+    webhook_configs:
+    - send_resolved: false
+      url: 'https://nosnch.in/SNITCH_URL'
+  - name: 'default-receiver'
     email_configs:
     - send_resolved: true
       to: $EMAIL_TO_ACCOUNT

@@ -3,7 +3,8 @@ version: "3.7"
 services:
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.4.1
+    # image: docker.elastic.co/elasticsearch/elasticsearch:7.4.1
+    image: jmb12686/elasticsearch
     configs:
       - source: elastic_config
         target: /usr/share/elasticsearch/config/elasticsearch.yml
@@ -19,6 +20,8 @@ services:
       mode: replicated
       replicas: 1
       resources:
+        limits:
+          memory: 1024M      
         reservations:
             memory: 1024M
 
@@ -34,6 +37,11 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+      resources:
+        limits:
+          memory: 512M      
+        reservations:
+            memory: 512M      
 
   filebeat:
     image: docker.elastic.co/beats/filebeat:7.4.1
@@ -65,7 +73,7 @@ configs:
     file: ./kibana/config/kibana.yml    
   filebeat_config:
     name: filebeat_config-${CONFIG_VERSION:-0}
-    file: ./filebeat/config/kibana.yml        
+    file: ./filebeat/config/filebeat.yml        
 
 networks:
   elk:
@@ -74,6 +82,6 @@ networks:
 volumes:
   filebeat: {}
   elasticsearch-data: {}
-  
+
 
         

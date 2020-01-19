@@ -46,8 +46,7 @@ services:
             memory: 1024M      
 
   filebeat:
-    # image: docker.elastic.co/beats/filebeat:7.4.1
-    image: jmb12686/filebeat
+    image: jmb12686/filebeat:v7.4.1
     hostname: "{{.Node.Hostname}}-filebeat"
     user: root
     networks:

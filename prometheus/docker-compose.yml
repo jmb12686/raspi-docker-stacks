@@ -186,6 +186,7 @@ services:
       - '--collector.textfile.directory=/etc/node-exporter/' 
       - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
       - '--no-collector.ipvs'
+      - '--no-collector.infiniband'
     deploy:
       mode: global
       resources:

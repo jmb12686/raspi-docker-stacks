@@ -3,8 +3,7 @@ version: "3.7"
 services:
 
   elasticsearch:
-    # image: docker.elastic.co/elasticsearch/elasticsearch:7.4.1
-    image: jmb12686/elasticsearch
+    image: jmb12686/elasticsearch:v7.4.1
     configs:
       - source: elastic_config
         target: /usr/share/elasticsearch/config/elasticsearch.yml
@@ -26,8 +25,7 @@ services:
             memory: 1024M
 
   kibana:
-    # image: docker.elastic.co/kibana/kibana:7.4.1
-    image: jmb12686/kibana
+    image: jmb12686/kibana:v7.4.1
     ports:
       - 5601:5601
     configs:

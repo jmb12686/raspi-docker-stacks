@@ -1,0 +1,87 @@
+version: "3.7"
+
+services:
+
+  elasticsearch:
+    image: jmb12686/elasticsearch:v7.4.1
+    configs:
+      - source: elastic_config
+        target: /usr/share/elasticsearch/config/elasticsearch.yml
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+      ELASTIC_PASSWORD: changeme
+      discovery.type: single-node
+    networks:
+      - elk
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          memory: 1024M      
+        reservations:
+            memory: 1024M
+
+  kibana:
+    image: jmb12686/kibana:v7.4.1
+    ports:
+      - 5601:5601
+    configs:
+      - source: kibana_config
+        target: /opt/kibana/config/kibana.yml
+        # target: /usr/share/kibana/config/kibana.yml
+    networks:
+      - elk
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          memory: 1024M      
+        reservations:
+            memory: 1024M      
+
+  filebeat:
+    image: jmb12686/filebeat:v7.4.1
+    hostname: "{{.Node.Hostname}}-filebeat"
+    user: root
+    networks:
+      - elk
+    configs:
+      - source: filebeat_config
+        target: /usr/share/filebeat/filebeat.yml
+    volumes:
+      - filebeat:/usr/share/filebeat/data
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/containers/:/var/lib/docker/containers/:ro
+      - /var/log/:/var/log/:ro
+    environment:
+      - ELASTICSEARCH_HOST:elasticsearch
+      - KIBANA_HOST:kibana
+    command: ["--strict.perms=false"]
+    deploy:
+      mode: global
+
+configs:
+  elastic_config:
+    name: elastic_config-${CONFIG_VERSION:-0}
+    file: ./elasticsearch/config/elasticsearch.yml
+  kibana_config:
+    name: kibana_config-${CONFIG_VERSION:-0}
+    file: ./kibana/config/kibana.yml    
+  filebeat_config:
+    name: filebeat_config-${CONFIG_VERSION:-0}
+    file: ./filebeat/config/filebeat.yml        
+
+networks:
+  elk:
+    driver: overlay
+
+volumes:
+  filebeat: {}
+  elasticsearch-data: {}
+
+
+        

@@ -1,0 +1,29 @@
+PUT _ilm/policy/filebeat-7.4.1
+{
+  "policy": {
+    "phases": {
+      "hot": {
+        "min_age": "0ms",
+        "actions": {
+          "rollover": {
+            "max_age": "7d",
+            "max_size": "2gb"
+          }
+        }
+      },
+      "warm": {
+        "actions": {}
+      },
+      "cold": {
+        "min_age": "14d",
+        "actions": {}
+      },
+      "delete": {
+        "min_age": "30d",
+        "actions": {
+          "delete": {}
+        }
+      }
+    }
+  }
+}

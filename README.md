@@ -1,11 +1,11 @@
 # RaspberryPi Docker Swarm Stacks
-A collection of Docker Stacks that I run on my home Raspberry Pi Docker Swarm cluster. 
+A collection of Docker Stacks that I run on my home Raspberry Pi Docker Swarm cluster.
 
 * **Prometheus** - Full metrics and monitoring pipeline.  Includes Docker, container, and node based metric collection, alerting, and visualization w/ **Grafana**
 * **pihole** - Network wide adblocker implementing DNS over HTTPS (DoH) via **cloudflared** proxy.
 * **portainer** - Docker Swarm cluster management UI.
 * **GitLab** - GitLab Omnibus deployment with GitLab CI/CD Runner.
-* **Elastic (ELK) Stack** - Logging aggregation, analysis, search, and visualization stack.  Comprised of Elasticsearch, Kibana, and Filebeats.
+* **Elastic (ELK) Stack** - Logging aggregation, analysis, search, and visualization stack.  Comprised of **Elasticsearch**, **Kibana**, and **Filebeat**.
 
 
 

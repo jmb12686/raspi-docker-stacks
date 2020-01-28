@@ -6,9 +6,11 @@ networks:
     attachable: true
 
 volumes:
-    prometheus: {}
-    grafana: {}
-    alertmanager: {}
+  prometheus:
+    driver: glusterfs:latest
+    name: "rpi-gfs"
+  grafana: {}
+  alertmanager: {}
 
 configs:
   prometheus:
@@ -199,7 +201,8 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
-      - '--storage.tsdb.retention=${PROMETHEUS_RETENTION:-72h}'
+      - '--storage.tsdb.retention.time=${PROMETHEUS_RETENTION:-30d}'
+      - '--storage.tsdb.retention.size=5GB'
     volumes:
       - prometheus:/prometheus
     configs:

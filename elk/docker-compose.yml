@@ -81,7 +81,9 @@ networks:
 
 volumes:
   filebeat: {}
-  elasticsearch-data: {}
+  elasticsearch-data:
+    driver: glusterfs:latest
+    name: "gfs-elasticsearch"
 
 
         

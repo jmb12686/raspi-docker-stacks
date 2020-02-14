@@ -12,11 +12,14 @@ processors:
       netinfo.enabled: true
 
 output.elasticsearch:
-  hosts: '${ELASTICSEARCH_HOST:elasticsearch:9200}'
+  hosts: ['elasticsearch:9200']
+
+setup.dashboards:
+  enabled: true
 
 setup.kibana:
-  host: "${KIBANA_HOST}:5601"
+  host: "kibana:5601"
+  protocol: 'http'
 
 xpack.monitoring:
   enabled: true
-  elasticsearch:

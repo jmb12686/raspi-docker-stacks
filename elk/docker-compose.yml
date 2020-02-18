@@ -83,7 +83,7 @@ volumes:
   filebeat: {}
   elasticsearch-data:
     driver: glusterfs:latest
-    name: "gfs-elasticsearch"
+    name: "shared-volume/elasticsearch"
 
 
         

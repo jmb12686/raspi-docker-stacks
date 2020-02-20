@@ -1,3 +1,19 @@
+# filebeat.modules:
+# - module: system
+#   syslog:
+#     enabled: true
+#   auth:
+#     enabled: true
+
+# https://www.elastic.co/guide/en/beats/filebeat/7.4/configuration-filebeat-options.html
+filebeat.inputs:
+- type: log
+  paths:
+    - /var/log/syslog
+    - /var/log/daemon.log
+    - /var/log/glusterfs/*.log
+    - /var/log/glusterfs/bricks/*.log
+
 filebeat.autodiscover:
   providers:
     - type: docker
@@ -14,8 +30,8 @@ processors:
 output.elasticsearch:
   hosts: ['elasticsearch:9200']
 
-setup.dashboards:
-  enabled: true
+# setup.dashboards:
+#   enabled: true
 
 setup.kibana:
   host: "kibana:5601"

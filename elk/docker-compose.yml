@@ -18,9 +18,9 @@ services:
     deploy:
       mode: replicated
       replicas: 1
-      placement:
-        constraints:
-          - node.hostname == raspberrypi-delta-3      
+#      placement:
+#        constraints:
+#          - node.hostname == raspberrypi-delta-3      
       resources:
         limits:
           memory: 2024M      

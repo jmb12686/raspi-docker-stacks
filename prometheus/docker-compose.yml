@@ -17,8 +17,10 @@ configs:
     name: prometheus-${CONFIG_VERSION:-0}
     file: ./prometheus/conf/prometheus.yml  
   node_rules:
+    name: swarm_node_rules-${CONFIG_VERSION:-0}
     file: ./prometheus/rules/swarm_node.rules.yml
   task_rules:
+    name: swarm_task_rules-${CONFIG_VERSION:-0}
     file: ./prometheus/rules/swarm_task.rules.yml
   meta_rules:
     file: ./prometheus/rules/snitch.rules.yml

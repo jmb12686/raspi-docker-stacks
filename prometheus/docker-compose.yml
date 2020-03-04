@@ -6,17 +6,21 @@ networks:
     attachable: true
 
 volumes:
-    prometheus: {}
-    grafana: {}
-    alertmanager: {}
+  prometheus:
+    driver: glusterfs:latest
+    name: "rpi-gfs"
+  grafana: {}
+  alertmanager: {}
 
 configs:
   prometheus:
     name: prometheus-${CONFIG_VERSION:-0}
     file: ./prometheus/conf/prometheus.yml  
   node_rules:
+    name: swarm_node_rules-${CONFIG_VERSION:-0}
     file: ./prometheus/rules/swarm_node.rules.yml
   task_rules:
+    name: swarm_task_rules-${CONFIG_VERSION:-0}
     file: ./prometheus/rules/swarm_task.rules.yml
   meta_rules:
     file: ./prometheus/rules/snitch.rules.yml
@@ -121,9 +125,6 @@ services:
     deploy:
       mode: replicated
       replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
       resources:
         limits:
           memory: 128M
@@ -157,9 +158,6 @@ services:
     deploy:
       mode: replicated
       replicas: 2
-      placement:
-        constraints:
-          - node.role == manager
       resources:
         limits:
           memory: 128M
@@ -199,7 +197,8 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
-      - '--storage.tsdb.retention=${PROMETHEUS_RETENTION:-72h}'
+      - '--storage.tsdb.retention.time=${PROMETHEUS_RETENTION:-30d}'
+      - '--storage.tsdb.retention.size=5GB'
     volumes:
       - prometheus:/prometheus
     configs:
@@ -216,11 +215,8 @@ services:
     deploy:
       mode: replicated
       replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
       resources:
         limits:
-          memory: 2048M
+          memory: 3072M
         reservations:
           memory: 1048M

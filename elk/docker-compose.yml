@@ -10,7 +10,7 @@ services:
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
     environment:
-      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+      ES_JAVA_OPTS: "-Xmx1024m -Xms1024m"
       ELASTIC_PASSWORD: changeme
       discovery.type: single-node
     networks:
@@ -20,7 +20,7 @@ services:
       replicas: 1
       resources:
         limits:
-          memory: 1024M      
+          memory: 2024M      
         reservations:
             memory: 1024M
 
@@ -81,7 +81,9 @@ networks:
 
 volumes:
   filebeat: {}
-  elasticsearch-data: {}
+  elasticsearch-data:
+    driver: glusterfs:latest
+    name: "shared-volume/elasticsearch"
 
 
         

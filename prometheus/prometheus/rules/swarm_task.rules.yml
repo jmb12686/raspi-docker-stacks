@@ -17,10 +17,10 @@ groups:
     annotations:
       summary: "Exporter down {{ $labels.job }} (instance {{ $labels.instance }})"
       description: "Prometheus exporter down\n  VALUE = {{ $value }}\n  JOB: {{ $labels.job }}\n  LABELS: {{ $labels }}"        
-  - alert: task_high_cpu_usage_50
+  - alert: task_high_cpu_usage_200
     expr: sum(rate(container_cpu_usage_seconds_total{container_label_com_docker_swarm_task_name=~".+"}[1m]))
       BY (container_label_com_docker_swarm_task_name, container_label_com_docker_swarm_node_id)
-      * 100 > 50
+      * 100 > 200
     for: 1m
     annotations:
       description: '{{ $labels.container_label_com_docker_swarm_task_name }} on ''{{
@@ -28,9 +28,9 @@ groups:
         $value}}%.'
       summary: CPU alert for Swarm task '{{ $labels.container_label_com_docker_swarm_task_name
         }}' on '{{ $labels.container_label_com_docker_swarm_node_id }}'
-  - alert: task_high_memory_usage_1g
+  - alert: task_high_memory_usage_2g
     expr: sum(container_memory_rss{container_label_com_docker_swarm_task_name=~".+"})
-      BY (container_label_com_docker_swarm_task_name, container_label_com_docker_swarm_node_id) > 1e+09
+      BY (container_label_com_docker_swarm_task_name, container_label_com_docker_swarm_node_id) > 2e+09
     for: 1m
     annotations:
       description: '{{ $labels.container_label_com_docker_swarm_task_name }} on ''{{

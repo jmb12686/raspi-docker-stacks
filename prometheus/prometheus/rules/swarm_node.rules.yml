@@ -6,7 +6,7 @@ groups:
   ##count(node_meta * on(instance) group_left(node_name) node_meta{node_id=~".+"}) < 3
   - alert: piholeMissing
     expr: (count(time() - container_last_seen{name=~".*pihole_pihole.*"} < 30) OR vector(0)) < 2
-    for: 5s
+    for: 30s
     labels:
       severity: error
     annotations:

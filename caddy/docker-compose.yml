@@ -1,0 +1,36 @@
+version: "3.7"
+
+configs:
+  caddyfile:
+    file: ./conf/Caddyfile
+  redirect-hosts:
+    file: ./conf/redirect_hosts.txt
+
+secrets:
+  google-client-conf-secret:
+    file: ./conf/google-client.conf
+
+volumes:
+  caddy-ssl:
+    driver: glusterfs:latest
+    name: "shared-volume/caddy-ssl"
+
+services:
+  caddy:
+    image: jmb12686/caddy:latest
+    ports:
+      - 81:80
+      - 444:443
+    volumes:
+      - caddy-ssl:/root/.caddy
+    configs:
+      - source: redirect-hosts
+        target: /redirect_hosts.txt
+      - source: caddyfile
+        target: /etc/Caddyfile
+    secrets:
+      - google-client-conf-secret
+    deploy:
+      mode: replicated
+      replicas: 1
+      

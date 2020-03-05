@@ -2,8 +2,10 @@ version: "3.7"
 
 configs:
   caddyfile:
+    name: caddyfile-${CONFIG_VERSION:-0}
     file: ./conf/Caddyfile
   redirect-hosts:
+    name: redirect-hosts-${CONFIG_VERSION:-0}
     file: ./conf/redirect_hosts.txt
 
 secrets:

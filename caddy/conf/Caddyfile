@@ -73,6 +73,7 @@ https://portainer.int.belisleonline.com:443 {
     tls jmb186@gmail.com
     proxy / http://raspi-swarm.home.local:9000 {
         transparent
+        websocket
     }
 }
 

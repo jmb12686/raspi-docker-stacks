@@ -1,6 +1,15 @@
+(ip-filter) {
+  ipfilter / {
+    rule allow
+    ip 192.168.0.1
+    database /data/GeoLite2-Country.mmdb
+    country US
+  }
+}
 
 
 https://auth.int.belisleonline.com:443 {
+        import ip-filter
         errors stderr
         log / stdout "{combined}"
         tls jmb186@gmail.com
@@ -27,6 +36,7 @@ https://auth.int.belisleonline.com:443 {
 }
 
 https://prometheus.int.belisleonline.com:443 {
+    import ip-filter
     import int-auth
     errors stderr
     log / stdout "{combined}"
@@ -37,6 +47,7 @@ https://prometheus.int.belisleonline.com:443 {
 }
 
 https://kibana.int.belisleonline.com:443 {
+    import ip-filter
     import int-auth
     errors stderr
     log / stdout "{combined}"
@@ -47,6 +58,7 @@ https://kibana.int.belisleonline.com:443 {
 }
 
 https://alertmanager.int.belisleonline.com:443 {
+    import ip-filter
     import int-auth
     errors stderr
     log / stdout "{combined}"
@@ -57,6 +69,7 @@ https://alertmanager.int.belisleonline.com:443 {
 }
 
 https://grafana.int.belisleonline.com:443 {
+    import ip-filter
     import int-auth
     errors stderr
     log / stdout "{combined}"
@@ -67,6 +80,7 @@ https://grafana.int.belisleonline.com:443 {
 }
 
 https://portainer.int.belisleonline.com:443 {
+    import ip-filter
     import int-auth
     errors stderr
     log / stdout "{combined}"

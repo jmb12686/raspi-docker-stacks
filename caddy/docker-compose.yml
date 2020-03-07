@@ -29,6 +29,9 @@ services:
         mode: host
     volumes:
       - caddy-ssl:/root/.caddy
+      - type: bind
+        source: /home/pi/GeoLite2-Country.mmdb
+        target: /data/GeoLite2-Country.mmdb
     configs:
       - source: redirect-hosts
         target: /redirect_hosts.txt

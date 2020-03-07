@@ -2,7 +2,7 @@
 
 https://auth.int.belisleonline.com:443 {
         errors stderr
-        log stdout
+        log / stdout "{combined}"
         tls jmb186@gmail.com
         redir 302 {
                 if {path} is /
@@ -29,7 +29,7 @@ https://auth.int.belisleonline.com:443 {
 https://prometheus.int.belisleonline.com:443 {
     import int-auth
     errors stderr
-    log stdout
+    log / stdout "{combined}"
     tls jmb186@gmail.com
     proxy / http://192.168.0.56:9090 {
         transparent
@@ -39,7 +39,7 @@ https://prometheus.int.belisleonline.com:443 {
 https://kibana.int.belisleonline.com:443 {
     import int-auth
     errors stderr
-    log stdout
+    log / stdout "{combined}"
     tls jmb186@gmail.com
     proxy / http://raspi-swarm.home.local:5601 {
         transparent
@@ -49,7 +49,7 @@ https://kibana.int.belisleonline.com:443 {
 https://alertmanager.int.belisleonline.com:443 {
     import int-auth
     errors stderr
-    log stdout
+    log / stdout "{combined}"
     tls jmb186@gmail.com
     proxy / http://raspi-swarm.home.local:9093 {
         transparent
@@ -59,7 +59,7 @@ https://alertmanager.int.belisleonline.com:443 {
 https://grafana.int.belisleonline.com:443 {
     import int-auth
     errors stderr
-    log stdout
+    log / stdout "{combined}"
     tls jmb186@gmail.com
     proxy / http://raspi-swarm.home.local:3000 {
         transparent
@@ -69,7 +69,7 @@ https://grafana.int.belisleonline.com:443 {
 https://portainer.int.belisleonline.com:443 {
     import int-auth
     errors stderr
-    log stdout
+    log / stdout "{combined}"
     tls jmb186@gmail.com
     proxy / http://raspi-swarm.home.local:9000 {
         transparent

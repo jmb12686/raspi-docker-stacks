@@ -13,5 +13,5 @@ This config file is created as a `Docker Secret` during stack deploy to secure t
 On a Docker Swarm Manager node, run the following
 ```bash
 export CONFIG_VERSION=X
-sudo docker stack deploy --compose-file=docker-compose.yml caddy
+sudo -E bash -c 'docker stack deploy --compose-file=docker-compose.yml caddy'
 ```

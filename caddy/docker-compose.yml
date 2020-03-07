@@ -21,8 +21,12 @@ services:
   caddy:
     image: jmb12686/caddy:latest
     ports:
-      - 81:80
-      - 444:443
+      - target: 80
+        published: 81
+        mode: host
+      - target: 443
+        published: 444
+        mode: host
     volumes:
       - caddy-ssl:/root/.caddy
     configs:
@@ -35,4 +39,7 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+      placement:
+        constraints:
+          - node.hostname == raspberrypi-beta
       

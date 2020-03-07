@@ -1,3 +1,4 @@
 prometheus/alertmanager/conf/prod.alertmanager.yml
 gitlab/root_password.txt
 caddy/conf/google-client.conf
+caddy/conf/github-client.conf

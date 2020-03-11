@@ -24,10 +24,36 @@ services:
         reservations:
             memory: 1024M
 
+  elastalert:
+    image: jmb12686/elastalert:v3.0.2
+    ports: 
+      - 3030:3030
+      - 3333:3333
+    configs:
+      - source: elastalert_config
+        target: config/config.json
+      - source: elastalert_elastalert
+        target: /opt/elastalert/config.yaml
+      - source: elastalert_elastalert_test
+        target: /opt/elastalert/config-test.yaml
+    secrets:
+      - elastalert_smtp_auth_file
+    networks:
+      - elk
+    deploy:
+      mode: replicated
+      replicas: 1
+
+
   kibana:
-    image: jmb12686/kibana:v7.4.1
+    image: jmb12686/kibana:v7.4.1-elastalert-arm
     ports:
       - 5601:5601
+    # command: /bin/bash -c "/opt/kibana/bin/kibana"
+    # command: /bin/bash -c "rm -rf /opt/kibana/optimize/* && /opt/kibana/bin/kibana"
+    #command: /bin/bash -c "/opt/kibana/bin/kibana-plugin install https://github.com/bitsensor/elastalert-kibana-plugin/releases/download/1.1.0/elastalert-kibana-plugin-1.1.0-7.4.1.zip && /opt/kibana/bin/kibana"
+    environment:
+      NODE_OPTIONS: "--max-old-space-size=2048"
     configs:
       - source: kibana_config
         target: /opt/kibana/config/kibana.yml
@@ -39,7 +65,7 @@ services:
       replicas: 1
       resources:
         limits:
-          memory: 1024M      
+          memory: 2048M      
         reservations:
             memory: 1024M      
 
@@ -73,7 +99,20 @@ configs:
     file: ./kibana/config/kibana.yml    
   filebeat_config:
     name: filebeat_config-${CONFIG_VERSION:-0}
-    file: ./filebeat/config/filebeat.yml        
+    file: ./filebeat/config/filebeat.yml
+  elastalert_config:
+    name: elastalert_config-${CONFIG_VERSION:-0}
+    file: ./elastalert/config.json
+  elastalert_elastalert:
+    name: elastalert_elastalert-${CONFIG_VERSION:-0}
+    file: ./elastalert/elastalert.yml
+  elastalert_elastalert_test:        
+    name: elastalert_elastalert_test-${CONFIG_VERSION:-0}
+    file: ./elastalert/elastalert-test.yml  
+
+secrets:
+  elastalert_smtp_auth_file:
+    file: ./elastalert/smtp_auth_file
 
 networks:
   elk:

@@ -38,6 +38,8 @@ services:
         target: /opt/elastalert/config-test.yaml
     secrets:
       - elastalert_smtp_auth_file
+    volumes:
+      - elastalert-rules:/opt/elastalert/rules
     networks:
       - elk
     deploy:
@@ -123,6 +125,9 @@ volumes:
   elasticsearch-data:
     driver: glusterfs:latest
     name: "shared-volume/elasticsearch"
+  elastalert-rules:
+    driver: glusterfs:latest
+    name: "shared-volume/elastalert-rules"
 
 
         

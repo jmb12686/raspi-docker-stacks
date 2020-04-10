@@ -197,8 +197,8 @@ services:
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
-      - "--storage.tsdb.retention.time=${PROMETHEUS_RETENTION:-30d}"
-      - "--storage.tsdb.retention.size=3GB"
+      - "--storage.tsdb.retention.time=${PROMETHEUS_RETENTION:-7d}"
+      - "--storage.tsdb.retention.size=1GB"
     volumes:
       - prometheus:/prometheus
     configs:

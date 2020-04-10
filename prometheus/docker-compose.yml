@@ -15,7 +15,7 @@ volumes:
 configs:
   prometheus:
     name: prometheus-${CONFIG_VERSION:-0}
-    file: ./prometheus/conf/prometheus.yml  
+    file: ./prometheus/conf/prometheus.yml
   node_rules:
     name: swarm_node_rules-${CONFIG_VERSION:-0}
     file: ./prometheus/rules/swarm_node.rules.yml
@@ -24,6 +24,8 @@ configs:
     file: ./prometheus/rules/swarm_task.rules.yml
   meta_rules:
     file: ./prometheus/rules/snitch.rules.yml
+  healthcheck-io_rules:
+    file: ./prometheus/rules/healthcheck-io_rules.yml
   grafana_datasource:
     file: ./grafana/datasources/prometheus.yaml
   grafana_provisioning_dashboards:
@@ -39,8 +41,6 @@ configs:
     file: ./alertmanager/conf/prod.alertmanager.yml
   blackbox_exporter:
     file: ./blackbox-exporter/blackbox.yml
-  
-    
 
 services:
   doh-status-probe:
@@ -48,10 +48,10 @@ services:
     networks:
       - net
     command:
-      - '--config.file=/config/blackbox.yml'
+      - "--config.file=/config/blackbox.yml"
     configs:
       - source: blackbox_exporter
-        target: /config/blackbox.yml      
+        target: /config/blackbox.yml
     deploy:
       mode: replicated
       replicas: 1
@@ -119,7 +119,7 @@ services:
       - source: grafana_dashboards_prometheus
         target: /etc/grafana/dashboards/swarmprom-prometheus-dash.json
       - source: grafana_dashboards_services
-        target: /etc/grafana/dashboards/swarmprom-services-dash.json        
+        target: /etc/grafana/dashboards/swarmprom-services-dash.json
     ports:
       - 3000:3000
     deploy:
@@ -144,13 +144,13 @@ services:
         target: /etc/alertmanager/alertmanager.yml
     command:
       - "--web.external-url=http://raspi-swarm.home.local:9093"
-      - '--config.file=/etc/alertmanager/alertmanager.yml'
-      - '--storage.path=/alertmanager'
-      - '--cluster.listen-address=0.0.0.0:8001'
-      - '--cluster.peer=tasks.alertmanager:8001'      
-      # - '--log.level=debug'     
-      # - '--cluster.advertise-address=' --> This arg gets set in the jmb12686/alertmanager-swarm image entry-point script.      
-                                           # It effectively gets set to the eth1 interface IP @ port 8001 to support Swarm networking  
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+      - "--storage.path=/alertmanager"
+      - "--cluster.listen-address=0.0.0.0:8001"
+      - "--cluster.peer=tasks.alertmanager:8001"
+      # - '--log.level=debug'
+      # - '--cluster.advertise-address=' --> This arg gets set in the jmb12686/alertmanager-swarm image entry-point script.
+      # It effectively gets set to the eth1 interface IP @ port 8001 to support Swarm networking
     ports:
       - 9093:9093
     volumes:
@@ -165,7 +165,7 @@ services:
           memory: 64M
 
   node-exporter:
-    image: jmb12686/node-exporter 
+    image: jmb12686/node-exporter
     networks:
       - net
     environment:
@@ -178,12 +178,12 @@ services:
       - /:/rootfs:ro
       - /etc/hostname:/etc/nodename:ro
     command:
-      - '--path.sysfs=/host/sys'
-      - '--path.procfs=/host/proc'
-      - '--path.rootfs=/rootfs'
-      - '--collector.textfile.directory=/etc/node-exporter/' 
-      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
-      - '--no-collector.ipvs'
+      - "--path.sysfs=/host/sys"
+      - "--path.procfs=/host/proc"
+      - "--path.rootfs=/rootfs"
+      - "--collector.textfile.directory=/etc/node-exporter/"
+      - "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)"
+      - "--no-collector.ipvs"
     deploy:
       mode: global
       resources:
@@ -195,21 +195,23 @@ services:
     networks:
       - net
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--storage.tsdb.retention.time=${PROMETHEUS_RETENTION:-30d}'
-      - '--storage.tsdb.retention.size=3GB'
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=${PROMETHEUS_RETENTION:-30d}"
+      - "--storage.tsdb.retention.size=3GB"
     volumes:
       - prometheus:/prometheus
     configs:
       - source: prometheus
-        target: /etc/prometheus/prometheus.yml  
+        target: /etc/prometheus/prometheus.yml
       - source: node_rules
         target: /etc/prometheus/swarm_node.rules.yml
       - source: task_rules
         target: /etc/prometheus/swarm_task.rules.yml
       - source: meta_rules
         target: /etc/prometheus/snitch.rules.yml
+      - source: healthcheck-io_rules
+        target: /etc/prometheus/healthcheck-io.rules.yml
     ports:
       - 9090:9090
     deploy:

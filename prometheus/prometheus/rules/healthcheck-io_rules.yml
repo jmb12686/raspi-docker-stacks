@@ -1,0 +1,11 @@
+groups:
+- name: meta
+  rules:
+  - alert: Healthcheck.io
+    expr: vector(1)
+    labels:
+      severity: critical
+    annotations:
+      description: This is a Healthcheck.io integration meant to ensure that the entire Alerting
+        pipeline is functional.
+      summary: Healthcheck.io Ping

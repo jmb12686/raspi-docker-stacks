@@ -13,7 +13,8 @@ route:
   - match:
       alertname: Healthcheck.io
     receiver: healthcheckio
-    repeat_interval: 5m
+    repeat_interval: 30s
+    group_interval: 1s
 
 receivers:
   - name: 'deadmanssnitch'

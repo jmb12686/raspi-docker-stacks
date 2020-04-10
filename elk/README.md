@@ -2,5 +2,6 @@
 
 On a Docker Swarm Manager node, run the following
 ```bash
-sudo docker stack deploy --compose-file=docker-compose.yml elk-stack
+export CONFIG_VERSION=X
+sudo -E bash -c 'docker stack deploy --compose-file=docker-compose.yml elk'
 ```

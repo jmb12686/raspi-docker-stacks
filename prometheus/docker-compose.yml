@@ -4,6 +4,8 @@ networks:
   net:
     driver: overlay
     attachable: true
+  caddy_internal_net:
+    external: true    
 
 volumes:
   prometheus:
@@ -81,8 +83,9 @@ services:
       - /var/run:/var/run
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
-    ports:
-      - 9094:8080
+    # Do not publish ports - force access thru caddy_internal_net
+    # ports:
+    #   - 9094:8080
     deploy:
       mode: global
       resources:
@@ -95,6 +98,7 @@ services:
     image: grafana/grafana:6.3.6
     networks:
       - net
+      - caddy_internal_net      
     environment:
       - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
       - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
@@ -120,8 +124,9 @@ services:
         target: /etc/grafana/dashboards/swarmprom-prometheus-dash.json
       - source: grafana_dashboards_services
         target: /etc/grafana/dashboards/swarmprom-services-dash.json
-    ports:
-      - 3000:3000
+    # Do not publish ports - force access thru caddy_internal_net  
+    # ports:
+    #   - 3000:3000
     deploy:
       mode: replicated
       replicas: 1
@@ -135,6 +140,7 @@ services:
     image: jmb12686/alertmanager-swarm
     networks:
       - net
+      - caddy_internal_net      
     environment:
       - SLACK_URL=${SLACK_URL:-https://hooks.slack.com/services/TOKEN}
       - SLACK_CHANNEL=${SLACK_CHANNEL:-general}
@@ -151,8 +157,9 @@ services:
       # - '--log.level=debug'
       # - '--cluster.advertise-address=' --> This arg gets set in the jmb12686/alertmanager-swarm image entry-point script.
       # It effectively gets set to the eth1 interface IP @ port 8001 to support Swarm networking
-    ports:
-      - 9093:9093
+    # Do not publish ports - force access thru caddy_internal_net
+      # ports:
+      # - 9093:9093
     volumes:
       - alertmanager:/alertmanager
     deploy:
@@ -170,8 +177,9 @@ services:
       - net
     environment:
       - NODE_ID={{.Node.ID}}
-    ports:
-      - 9100:9100
+    # Do not publish ports - force access thru caddy_internal_net
+      # ports:
+      # - 9100:9100
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
@@ -194,6 +202,7 @@ services:
     image: prom/prometheus
     networks:
       - net
+      - caddy_internal_net      
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
@@ -212,8 +221,9 @@ services:
         target: /etc/prometheus/snitch.rules.yml
       - source: healthcheck-io_rules
         target: /etc/prometheus/healthcheck-io.rules.yml
-    ports:
-      - 9090:9090
+    # Do not publish ports - force access thru caddy_internal_net
+    # ports:
+    #   - 9090:9090
     deploy:
       mode: replicated
       replicas: 1

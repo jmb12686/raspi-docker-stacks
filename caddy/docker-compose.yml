@@ -12,6 +12,11 @@ secrets:
   google-client-conf-secret:
     file: ./conf/google-client.conf
 
+networks:
+  internal_net:
+    driver: overlay
+    attachable: true
+
 volumes:
   caddy-ssl:
     driver: glusterfs:latest
@@ -27,6 +32,8 @@ services:
       - target: 443
         published: 444
         mode: host
+    networks:
+      - internal_net
     volumes:
       - caddy-ssl:/root/.caddy
       - type: bind

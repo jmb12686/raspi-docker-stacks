@@ -85,7 +85,7 @@ https://portainer.int.belisleonline.com:443 {
     errors stderr
     log / stdout "{combined}"
     tls jmb186@gmail.com
-    proxy / http://raspi-swarm.home.local:9000 {
+    proxy / http://portainer:9000 {
         transparent
         websocket
     }

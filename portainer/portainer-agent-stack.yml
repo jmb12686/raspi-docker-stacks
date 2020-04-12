@@ -34,13 +34,15 @@ services:
     environment:
       AGENT_SECRET: ${PORTAINER_AGENT_SECRET:?err}
     command: -H tcp://tasks.agent:9001 --tlsskipverify
-    ports:
-      - "9000:9000"
-      - "8000:8000"
+    # Do not publish ports - force access thru caddy_internal_net
+    # ports:
+    #   - "9000:9000"
+    #   - "8000:8000"
     volumes:
       - portainer_data:/data
     networks:
       - agent_network
+      - caddy_internal_net
     deploy:
       mode: replicated
       replicas: 1
@@ -56,6 +58,8 @@ networks:
   agent_network:
     driver: overlay
     attachable: true
+  caddy_internal_net:
+    external: true
 
 volumes:
   portainer_data:

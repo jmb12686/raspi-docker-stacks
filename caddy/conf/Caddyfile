@@ -52,7 +52,7 @@ https://kibana.int.belisleonline.com:443 {
     errors stderr
     log / stdout "{combined}"
     tls jmb186@gmail.com
-    proxy / http://raspi-swarm.home.local:5601 {
+    proxy / http://kibana:5601 {
         transparent
     }
 }

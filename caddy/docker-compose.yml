@@ -1,0 +1,48 @@
+version: "3.7"
+
+configs:
+  caddyfile:
+    name: caddyfile-${CONFIG_VERSION:-0}
+    file: ./conf/Caddyfile
+  redirect-hosts:
+    name: redirect-hosts-${CONFIG_VERSION:-0}
+    file: ./conf/redirect_hosts.txt
+
+secrets:
+  google-client-conf-secret:
+    file: ./conf/google-client.conf
+
+volumes:
+  caddy-ssl:
+    driver: glusterfs:latest
+    name: "shared-volume/caddy-ssl"
+
+services:
+  caddy:
+    image: jmb12686/caddy:latest
+    ports:
+      - target: 80
+        published: 81
+        mode: host
+      - target: 443
+        published: 444
+        mode: host
+    volumes:
+      - caddy-ssl:/root/.caddy
+      - type: bind
+        source: /home/pi/GeoLite2-Country.mmdb
+        target: /data/GeoLite2-Country.mmdb
+    configs:
+      - source: redirect-hosts
+        target: /redirect_hosts.txt
+      - source: caddyfile
+        target: /etc/Caddyfile
+    secrets:
+      - google-client-conf-secret
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == raspberrypi-beta
+      

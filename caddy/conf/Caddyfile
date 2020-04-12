@@ -1,0 +1,93 @@
+(ip-filter) {
+  ipfilter / {
+    rule allow
+    ip 192.168.0.1
+    database /data/GeoLite2-Country.mmdb
+    country US
+  }
+}
+
+
+https://auth.int.belisleonline.com:443 {
+        import ip-filter
+        errors stderr
+        log / stdout "{combined}"
+        tls jmb186@gmail.com
+        redir 302 {
+                if {path} is /
+                / /login
+        }
+
+        login { 
+                import /run/secrets/google-client-conf-secret
+                redirect_check_referer false
+                redirect_host_file /redirect_hosts.txt
+                cookie_domain int.belisleonline.com
+        }
+}
+
+(int-auth) {
+        jwt {
+                token_source cookie jwt_token
+                path /
+                redirect https://auth.int.belisleonline.com/login?backTo=https%3A%2F%2F{host}{rewrite_uri_escaped}
+                allow sub jmb186@gmail.com
+        }
+}
+
+https://prometheus.int.belisleonline.com:443 {
+    import ip-filter
+    import int-auth
+    errors stderr
+    log / stdout "{combined}"
+    tls jmb186@gmail.com
+    proxy / http://192.168.0.56:9090 {
+        transparent
+    }
+}
+
+https://kibana.int.belisleonline.com:443 {
+    import ip-filter
+    import int-auth
+    errors stderr
+    log / stdout "{combined}"
+    tls jmb186@gmail.com
+    proxy / http://raspi-swarm.home.local:5601 {
+        transparent
+    }
+}
+
+https://alertmanager.int.belisleonline.com:443 {
+    import ip-filter
+    import int-auth
+    errors stderr
+    log / stdout "{combined}"
+    tls jmb186@gmail.com
+    proxy / http://raspi-swarm.home.local:9093 {
+        transparent
+    }
+}
+
+https://grafana.int.belisleonline.com:443 {
+    import ip-filter
+    import int-auth
+    errors stderr
+    log / stdout "{combined}"
+    tls jmb186@gmail.com
+    proxy / http://raspi-swarm.home.local:3000 {
+        transparent
+    }
+}
+
+https://portainer.int.belisleonline.com:443 {
+    import ip-filter
+    import int-auth
+    errors stderr
+    log / stdout "{combined}"
+    tls jmb186@gmail.com
+    proxy / http://raspi-swarm.home.local:9000 {
+        transparent
+        websocket
+    }
+}
+

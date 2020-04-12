@@ -10,12 +10,21 @@ route:
       alertname: DeadMansSnitch
     receiver: deadmanssnitch
     repeat_interval: 5m
+  - match:
+      alertname: Healthcheck.io
+    receiver: healthcheckio
+    repeat_interval: 30s
+    group_interval: 1s
 
 receivers:
   - name: 'deadmanssnitch'
     webhook_configs:
     - send_resolved: false
       url: 'https://nosnch.in/SNITCH_URL'
+  - name: 'healthcheckio'
+    webhook_configs:
+    - send_resolved: false
+      url: 'https://hc-ping.com/UNIQUE_PING_URL'
   - name: 'default-receiver'
     email_configs:
     - send_resolved: true

@@ -19,10 +19,6 @@ services:
       - agent_network
     deploy:
       mode: global
-      placement:
-        constraints: 
-          - node.platform.os == linux
-          - node.platform.arch == armv7l
       resources:
         limits:
           memory: 128M

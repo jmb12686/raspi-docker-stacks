@@ -26,9 +26,9 @@ services:
 
   elastalert:
     image: jmb12686/elastalert:v3.0.2
-    ports: 
-      - 3030:3030
-      - 3333:3333
+    # ports: 
+    #   - 3030:3030
+    #   - 3333:3333
     configs:
       - source: elastalert_config
         target: config/config.json
@@ -52,11 +52,15 @@ services:
 
   kibana:
     image: jmb12686/kibana:v7.4.1-elastalert-arm
-    ports:
-      - 5601:5601
+    # Do not publish ports - force access thru caddy_internal_net
+    # ports:
+    #   - 5601:5601
+
+    # Legacy - custom runtime commmands to install plugins, spikes CPU and RAM causing infinite crashes...
     # command: /bin/bash -c "/opt/kibana/bin/kibana"
     # command: /bin/bash -c "rm -rf /opt/kibana/optimize/* && /opt/kibana/bin/kibana"
-    #command: /bin/bash -c "/opt/kibana/bin/kibana-plugin install https://github.com/bitsensor/elastalert-kibana-plugin/releases/download/1.1.0/elastalert-kibana-plugin-1.1.0-7.4.1.zip && /opt/kibana/bin/kibana"
+    # command: /bin/bash -c "/opt/kibana/bin/kibana-plugin install https://github.com/bitsensor/elastalert-kibana-plugin/releases/download/1.1.0/elastalert-kibana-plugin-1.1.0-7.4.1.zip && /opt/kibana/bin/kibana"
+
     environment:
       NODE_OPTIONS: "--max-old-space-size=2048"
     configs:
@@ -65,6 +69,7 @@ services:
         # target: /usr/share/kibana/config/kibana.yml
     networks:
       - elk
+      - caddy_internal_net
     deploy:
       mode: replicated
       replicas: 1
@@ -122,6 +127,8 @@ secrets:
 networks:
   elk:
     driver: overlay
+  caddy_internal_net:
+    external: true
 
 volumes:
   filebeat: {}

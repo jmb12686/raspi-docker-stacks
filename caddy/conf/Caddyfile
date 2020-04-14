@@ -41,7 +41,7 @@ https://prometheus.int.belisleonline.com:443 {
     errors stderr
     log / stdout "{combined}"
     tls jmb186@gmail.com
-    proxy / http://192.168.0.56:9090 {
+    proxy / http://prometheus:9090 {
         transparent
     }
 }
@@ -52,7 +52,7 @@ https://kibana.int.belisleonline.com:443 {
     errors stderr
     log / stdout "{combined}"
     tls jmb186@gmail.com
-    proxy / http://raspi-swarm.home.local:5601 {
+    proxy / http://kibana:5601 {
         transparent
     }
 }
@@ -63,7 +63,7 @@ https://alertmanager.int.belisleonline.com:443 {
     errors stderr
     log / stdout "{combined}"
     tls jmb186@gmail.com
-    proxy / http://raspi-swarm.home.local:9093 {
+    proxy / http://alertmanager:9093 {
         transparent
     }
 }
@@ -74,7 +74,7 @@ https://grafana.int.belisleonline.com:443 {
     errors stderr
     log / stdout "{combined}"
     tls jmb186@gmail.com
-    proxy / http://raspi-swarm.home.local:3000 {
+    proxy / http://grafana:3000 {
         transparent
     }
 }
@@ -85,7 +85,7 @@ https://portainer.int.belisleonline.com:443 {
     errors stderr
     log / stdout "{combined}"
     tls jmb186@gmail.com
-    proxy / http://raspi-swarm.home.local:9000 {
+    proxy / http://portainer:9000 {
         transparent
         websocket
     }

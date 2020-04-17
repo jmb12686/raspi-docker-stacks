@@ -206,8 +206,8 @@ services:
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
-      - "--storage.tsdb.retention.time=${PROMETHEUS_RETENTION:-7d}"
-      - "--storage.tsdb.retention.size=1GB"
+      - "--storage.tsdb.retention.time=${PROMETHEUS_RETENTION:-21d}"
+      - "--storage.tsdb.retention.size=3GB"
     volumes:
       - prometheus:/prometheus
     configs:
@@ -227,6 +227,9 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+      placement:
+        constraints: 
+          - node.platform.arch == aarch64      
       resources:
         limits:
           memory: 3072M

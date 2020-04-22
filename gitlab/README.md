@@ -14,8 +14,10 @@ $ sudo docker exec -it CONTAINER_ID gitlab-runner register \
 --executor "docker" \
 --docker-image alpine:latest \
 --docker-privileged \
---registration-token "REPLACE_ME!" \
+--registration-token "sZcx2xcHAwgHZiTQVbHs" \
 --description "docker-runner" \
 --locked="false" \
 --access-level="not_protected"
 ```
+
+Edit the config to add `session_server` attributes after gitlab runnner is registered.  Then restart the runner: https://gitlab.com/gitlab-org/gitlab-runner/issues/3885

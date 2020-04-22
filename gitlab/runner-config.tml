@@ -1,12 +1,14 @@
 concurrent = 1
 check_interval = 0
 [session_server]
+  listen_address = "0.0.0.0:8093" #  listen on all available interfaces on port 8093
+  advertise_address = "raspi-swarm.home.local:8093"
   session_timeout = 1800
 session_timecheck_interval = 0
 [[runners]]  
   name = "docker-runner"
   url = "http://raspi-swarm.home.local:88"
-  token = "kiQs2E6nfwsjxEvpwCNs"
+  token = "sZcx2xcHAwgHZiTQVbHs"
   executor = "docker"  
   [runners.custom_build_dir]
   [runners.docker]    

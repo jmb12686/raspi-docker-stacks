@@ -9,10 +9,13 @@ services:
         target: /usr/share/elasticsearch/config/elasticsearch.yml
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     environment:
-      ES_JAVA_OPTS: "-Xmx1024m -Xms1024m"
+      ES_JAVA_OPTS: "-Xmx1500m -Xms1500m"
       ELASTIC_PASSWORD: changeme
       discovery.type: single-node
+      TZ: America/New_York
     networks:
       - elk
     deploy:
@@ -25,7 +28,7 @@ services:
             memory: 1024M
 
   elastalert:
-    image: jmb12686/elastalert:v3.0.2
+    image: jmb12686/elastalert:v3.1
     # ports: 
     #   - 3030:3030
     #   - 3333:3333
@@ -63,6 +66,10 @@ services:
 
     environment:
       NODE_OPTIONS: "--max-old-space-size=2048"
+      TZ: America/New_York      
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro    
     configs:
       - source: kibana_config
         target: /opt/kibana/config/kibana.yml
@@ -81,7 +88,7 @@ services:
 
   filebeat:
     image: jmb12686/filebeat:v7.4.1
-    hostname: "{{.Node.Hostname}}-filebeat"
+    hostname: "{{.Node.Hostname}}"
     user: root
     networks:
       - elk

@@ -1,0 +1,49 @@
+version: "3.7"
+
+services:
+  unifi:
+    image: jmb12686/unifi:v5.12.66
+    init: true
+    environment:
+      TZ: "America/New_York"
+      RUNAS_UID0: "false"
+      UNIFI_UID: 1000
+      UNIFI_GID: 1000
+    ports:
+      - "3478:3478/udp" # STUN
+      - "6789:6789/tcp" # Speed test
+      - "8080:8080/tcp" # Device/ controller comm.
+      - "8443:8443/tcp" # Controller GUI/API as seen in a web browser
+      - "8880:8880/tcp" # HTTP portal redirection
+      - "8843:8843/tcp" # HTTPS portal redirection
+      - "10001:10001/udp" # AP discovery
+    volumes:
+      - unifi-controller-data:/unifi
+    networks:
+      - unifi
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          memory: 1024M
+        reservations:
+          memory: 1024M
+  log-pipe:
+    image: bash
+    command: bash -c 'tail -F /unifi/log/*.log'
+    volumes:
+      - unifi-controller-data:/unifi
+    deploy:
+      mode: replicated
+      replicas: 1
+
+
+networks:
+  unifi:
+    driver: overlay
+
+volumes:
+  unifi-controller-data:
+    driver: glusterfs:latest
+    name: "shared-volume/unifi-controller-data"

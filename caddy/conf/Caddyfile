@@ -18,7 +18,7 @@ https://auth.int.belisleonline.com:443 {
                 / /login
         }
 
-        login { 
+        login {
                 import /run/secrets/google-client-conf-secret
                 redirect_check_referer false
                 redirect_host_file /redirect_hosts.txt
@@ -34,6 +34,30 @@ https://auth.int.belisleonline.com:443 {
                 allow sub jmb186@gmail.com
         }
 }
+
+https://gitlab.int.belisleonline.com:443 {
+    import ip-filter
+    errors stderr
+    log / stdout "{combined}"
+    tls jmb186@gmail.com
+    proxy / http://gitlab:80 {
+        transparent
+    }
+}
+
+https://unifi.int.belisleonline.com:443 {
+    import ip-filter
+    import int-auth
+    errors stderr
+    log / stdout "{combined}"
+    tls jmb186@gmail.com
+    proxy / https://raspi-swarm.home.local:8443 {
+        transparent
+        websocket
+        insecure_skip_verify
+    }
+}
+
 
 https://prometheus.int.belisleonline.com:443 {
     import ip-filter

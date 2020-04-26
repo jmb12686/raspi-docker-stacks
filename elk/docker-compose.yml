@@ -9,6 +9,7 @@ services:
         target: /usr/share/elasticsearch/config/elasticsearch.yml
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
+      - elasticsearch-snapshot:/mnt/elasticsearch-snapshot
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     environment:
@@ -23,13 +24,13 @@ services:
       replicas: 1
       resources:
         limits:
-          memory: 2024M      
+          memory: 2500M
         reservations:
-            memory: 1024M
+            memory: 2000M
 
   elastalert:
     image: jmb12686/elastalert:v3.1
-    # ports: 
+    # ports:
     #   - 3030:3030
     #   - 3333:3333
     configs:
@@ -66,10 +67,10 @@ services:
 
     environment:
       NODE_OPTIONS: "--max-old-space-size=2048"
-      TZ: America/New_York      
+      TZ: America/New_York
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro    
+      - /etc/timezone:/etc/timezone:ro
     configs:
       - source: kibana_config
         target: /opt/kibana/config/kibana.yml
@@ -82,9 +83,9 @@ services:
       replicas: 1
       resources:
         limits:
-          memory: 2048M      
+          memory: 2048M
         reservations:
-            memory: 1024M      
+            memory: 1024M
 
   filebeat:
     image: jmb12686/filebeat:v7.4.1
@@ -113,7 +114,7 @@ configs:
     file: ./elasticsearch/config/elasticsearch.yml
   kibana_config:
     name: kibana_config-${CONFIG_VERSION:-0}
-    file: ./kibana/config/kibana.yml    
+    file: ./kibana/config/kibana.yml
   filebeat_config:
     name: filebeat_config-${CONFIG_VERSION:-0}
     file: ./filebeat/config/filebeat.yml
@@ -123,9 +124,9 @@ configs:
   elastalert_elastalert:
     name: elastalert_elastalert-${CONFIG_VERSION:-0}
     file: ./elastalert/elastalert.yml
-  elastalert_elastalert_test:        
+  elastalert_elastalert_test:
     name: elastalert_elastalert_test-${CONFIG_VERSION:-0}
-    file: ./elastalert/elastalert-test.yml  
+    file: ./elastalert/elastalert-test.yml
 
 secrets:
   elastalert_smtp_auth_file:
@@ -142,9 +143,12 @@ volumes:
   elasticsearch-data:
     driver: glusterfs:latest
     name: "shared-volume/elasticsearch"
+  elasticsearch-snapshot:
+    driver: glusterfs:latest
+    name: "shared-volume/elasticsearch-snapshot"    
   elastalert-rules:
     driver: glusterfs:latest
     name: "shared-volume/elastalert-rules"
 
 
-        
+

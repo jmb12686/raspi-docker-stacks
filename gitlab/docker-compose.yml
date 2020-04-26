@@ -1,63 +1,95 @@
 version: "3.7"
 
-# networks:
-#   net:
-#     driver: overlay
-#     attachable: true
+networks:
+  caddy_internal_net:
+    external: true
 
 volumes:
-    gitlab-data: {}
+    gitlab-data:
+      driver: glusterfs:latest
+      name: "shared-volume/gitlab/data"
+    # gitlab-logs:
+    #   driver: glusterfs:latest
+    #   name: "shared-volume/gitlab/log"
+    gitlab-config:
+      driver: glusterfs:latest
+      name: "shared-volume/gitlab/config"
+    # gitlab-data: {}
     gitlab-logs: {}
-    gitlab-config: {}
+    # gitlab-config: {}
     gitlab-runner-config: {}
 
-configs:
-  gitlab:
-    name: gitlab-${CONFIG_VERSION:-0}
-    file: ./gitlab.rb
-  gitlab-runner:
-    name: gitlab-runner-${CONFIG_VERSION:-0}
-    file: ./runner-config.tml
+# configs:
+  # gitlab:
+  #   name: gitlab-${CONFIG_VERSION:-0}
+  #   file: ./gitlab.rb
+  # gitlab-runner:
+  #   name: gitlab-runner-${CONFIG_VERSION:-0}
+  #   file: ./runner-config.tml
+# configs:
+#   wrapper-start-script:
+#     name: wrapper-start-script
+#     file: ./wrapper
 secrets:
   gitlab_root_password:
     file: ./root_password.txt
 
 services:
   gitlab:
-    image: ulm0/gitlab:12.9.2
-    # networks:
-    #   - net    
-    ports:
-      - 222:22
-      - 88:88
-      - 4433:443
+    image: jmb12686/gitlab:12.9.2
+    networks:
+      - caddy_internal_net
     volumes:
       - gitlab-data:/var/opt/gitlab
       - gitlab-logs:/var/log/gitlab
       - gitlab-config:/etc/gitlab
     environment:
-      GITLAB_OMNIBUS_CONFIG: "from_file('/omnibus_config.rb')"
-    configs:
-      - source: gitlab
-        target: /omnibus_config.rb
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'https://gitlab.int.belisleonline.com' # Address to access gitlab from the outside internet
+        gitlab_rails['initial_root_password'] = File.read('/run/secrets/gitlab_root_password')
+        ## Override default detection of the 'external_url' to enable usage of external load balancer and TLS termination
+        ## https://docs.gitlab.com/omnibus/settings/nginx.html#supporting-proxied-ssl
+        nginx['listen_port'] = 80
+        nginx['listen_https'] = false
+
+        # Reduce the number of running workers to the minimum in order to reduce memory usage
+        # unicorn['worker_processes'] = 2
+        # sidekiq['concurrency'] = 9
+
+        # Turn off monitoring to reduce idle cpu and disk usage
+        prometheus_monitoring['enable'] = false
+    # configs:
+    #   - source: gitlab
+    #     target: /omnibus_config.rb
+    # configs:
+    #   - source: wrapper-start-script
+    #     target: /assets/wrapper
     secrets:
       - gitlab_root_password
+    # command: cp /assets/wrapper /assets/wrapper2 && chmod +x /assets/wrapper2 && /assets/wrapper2
     deploy:
       mode: replicated
       replicas: 1
       # placement:
       #   constraints:
-      #     - node.hostname == raspberrypi-delta-4
+      #     - node.hostname == raspberrypi-delta-2
       resources:
         limits:
           memory: 4000M
         reservations:
           memory: 2048M
+    stop_grace_period: 60s
+    healthcheck:
+      test: ["CMD", "/opt/gitlab/bin/gitlab-healthcheck", "--fail", "--max-time", "15"]
+      interval: 60s
+      timeout: 30s
+      retries: 8
+      start_period: 4m
   gitlab-runner:
     image: klud/gitlab-runner:alpine
     # command:
     ports:
-      - 8093:8093    
+      - 8093:8093
     volumes:
       - gitlab-runner-config:/etc/gitlab-runner
       - /var/run/docker.sock:/var/run/docker.sock
@@ -67,6 +99,6 @@ services:
     deploy:
       mode: replicated
       replicas: 1
-      placement:
-        constraints:
-          - node.hostname == raspberrypi-delta
+      # placement:
+      #   constraints:
+      #     - node.hostname == raspberrypi-delta

@@ -8,28 +8,12 @@ volumes:
     gitlab-data:
       driver: glusterfs:latest
       name: "shared-volume/gitlab/data"
-    # gitlab-logs:
-    #   driver: glusterfs:latest
-    #   name: "shared-volume/gitlab/log"
     gitlab-config:
       driver: glusterfs:latest
       name: "shared-volume/gitlab/config"
-    # gitlab-data: {}
     gitlab-logs: {}
-    # gitlab-config: {}
     gitlab-runner-config: {}
 
-# configs:
-  # gitlab:
-  #   name: gitlab-${CONFIG_VERSION:-0}
-  #   file: ./gitlab.rb
-  # gitlab-runner:
-  #   name: gitlab-runner-${CONFIG_VERSION:-0}
-  #   file: ./runner-config.tml
-# configs:
-#   wrapper-start-script:
-#     name: wrapper-start-script
-#     file: ./wrapper
 secrets:
   gitlab_root_password:
     file: ./root_password.txt
@@ -58,21 +42,11 @@ services:
 
         # Turn off monitoring to reduce idle cpu and disk usage
         prometheus_monitoring['enable'] = false
-    # configs:
-    #   - source: gitlab
-    #     target: /omnibus_config.rb
-    # configs:
-    #   - source: wrapper-start-script
-    #     target: /assets/wrapper
     secrets:
       - gitlab_root_password
-    # command: cp /assets/wrapper /assets/wrapper2 && chmod +x /assets/wrapper2 && /assets/wrapper2
     deploy:
       mode: replicated
       replicas: 1
-      # placement:
-      #   constraints:
-      #     - node.hostname == raspberrypi-delta-2
       resources:
         limits:
           memory: 4000M
@@ -87,18 +61,11 @@ services:
       start_period: 4m
   gitlab-runner:
     image: klud/gitlab-runner:alpine
-    # command:
     ports:
       - 8093:8093
     volumes:
       - gitlab-runner-config:/etc/gitlab-runner
       - /var/run/docker.sock:/var/run/docker.sock
-    # configs:
-    #   - source: gitlab-runner
-    #     target: /etc/gitlab-runner/config.toml
     deploy:
       mode: replicated
       replicas: 1
-      # placement:
-      #   constraints:
-      #     - node.hostname == raspberrypi-delta

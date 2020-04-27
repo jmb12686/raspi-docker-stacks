@@ -5,7 +5,7 @@ networks:
     driver: overlay
     attachable: true
   caddy_internal_net:
-    external: true    
+    external: true
 
 volumes:
   prometheus:
@@ -98,7 +98,7 @@ services:
     image: grafana/grafana:6.3.6
     networks:
       - net
-      - caddy_internal_net      
+      - caddy_internal_net
     environment:
       - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
       - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
@@ -124,7 +124,7 @@ services:
         target: /etc/grafana/dashboards/swarmprom-prometheus-dash.json
       - source: grafana_dashboards_services
         target: /etc/grafana/dashboards/swarmprom-services-dash.json
-    # Do not publish ports - force access thru caddy_internal_net  
+    # Do not publish ports - force access thru caddy_internal_net
     # ports:
     #   - 3000:3000
     deploy:
@@ -140,7 +140,7 @@ services:
     image: jmb12686/alertmanager-swarm
     networks:
       - net
-      - caddy_internal_net      
+      - caddy_internal_net
     environment:
       - SLACK_URL=${SLACK_URL:-https://hooks.slack.com/services/TOKEN}
       - SLACK_CHANNEL=${SLACK_CHANNEL:-general}
@@ -149,7 +149,7 @@ services:
       - source: alert_manager
         target: /etc/alertmanager/alertmanager.yml
     command:
-      - "--web.external-url=http://raspi-swarm.home.local:9093"
+      - "--web.external-url=https://alertmanager.int.belisleonline.com"
       - "--config.file=/etc/alertmanager/alertmanager.yml"
       - "--storage.path=/alertmanager"
       - "--cluster.listen-address=0.0.0.0:8001"
@@ -202,12 +202,13 @@ services:
     image: prom/prometheus
     networks:
       - net
-      - caddy_internal_net      
+      - caddy_internal_net
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
       - "--storage.tsdb.retention.time=${PROMETHEUS_RETENTION:-21d}"
       - "--storage.tsdb.retention.size=3GB"
+      - "--web.external-url=https://prometheus.int.belisleonline.com"
     volumes:
       - prometheus:/prometheus
     configs:
@@ -228,10 +229,11 @@ services:
       mode: replicated
       replicas: 1
       placement:
-        constraints: 
-          - node.platform.arch == aarch64      
+        constraints:
+          - node.platform.arch == aarch64
       resources:
         limits:
           memory: 3072M
         reservations:
           memory: 2048M
+    stop_grace_period: 60s

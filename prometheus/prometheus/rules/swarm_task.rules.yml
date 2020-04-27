@@ -8,7 +8,7 @@ groups:
       severity: error
     annotations:
       summary: "Probe failed {{ $labels.job }} (instance {{ $labels.instance }})"
-      description: "Probe failed\n  VALUE = {{ $value }}\n  JOB: {{ $labels.job }}\n LABELS: {{ $labels }}"  
+      description: "Probe failed\n  VALUE = {{ $value }}\n  JOB: {{ $labels.job }}\n LABELS: {{ $labels }}"
   - alert: ExporterDown
     expr: up == 0
     for: 5m
@@ -16,7 +16,7 @@ groups:
       severity: warning
     annotations:
       summary: "Exporter down {{ $labels.job }} (instance {{ $labels.instance }})"
-      description: "Prometheus exporter down\n  VALUE = {{ $value }}\n  JOB: {{ $labels.job }}\n  LABELS: {{ $labels }}"        
+      description: "Prometheus exporter down\n  VALUE = {{ $value }}\n  JOB: {{ $labels.job }}\n  LABELS: {{ $labels }}"
   - alert: task_high_cpu_usage_200
     expr: sum(rate(container_cpu_usage_seconds_total{container_label_com_docker_swarm_task_name=~".+"}[1m]))
       BY (container_label_com_docker_swarm_task_name, container_label_com_docker_swarm_node_id)
@@ -28,9 +28,9 @@ groups:
         $value}}%.'
       summary: CPU alert for Swarm task '{{ $labels.container_label_com_docker_swarm_task_name
         }}' on '{{ $labels.container_label_com_docker_swarm_node_id }}'
-  - alert: task_high_memory_usage_2g
+  - alert: task_high_memory_usage_3g
     expr: sum(container_memory_rss{container_label_com_docker_swarm_task_name=~".+"})
-      BY (container_label_com_docker_swarm_task_name, container_label_com_docker_swarm_node_id) > 2e+09
+      BY (container_label_com_docker_swarm_task_name, container_label_com_docker_swarm_node_id) > 3e+09
     for: 1m
     annotations:
       description: '{{ $labels.container_label_com_docker_swarm_task_name }} on ''{{

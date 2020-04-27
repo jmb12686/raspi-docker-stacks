@@ -74,7 +74,6 @@ services:
     configs:
       - source: kibana_config
         target: /opt/kibana/config/kibana.yml
-        # target: /usr/share/kibana/config/kibana.yml
     networks:
       - elk
       - caddy_internal_net
@@ -140,12 +139,10 @@ networks:
 
 volumes:
   filebeat: {}
-  elasticsearch-data:
-    driver: glusterfs:latest
-    name: "shared-volume/elasticsearch"
+  elasticsearch-data: {}
   elasticsearch-snapshot:
     driver: glusterfs:latest
-    name: "shared-volume/elasticsearch-snapshot"    
+    name: "shared-volume/elasticsearch-snapshot"
   elastalert-rules:
     driver: glusterfs:latest
     name: "shared-volume/elastalert-rules"

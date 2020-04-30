@@ -23,7 +23,7 @@ secrets:
 
 services:
   gitlab:
-    image: jmb12686/gitlab:12.9.2
+    image: jmb12686/gitlab:12.10.0
     networks:
       - caddy_internal_net
       - runner_network

@@ -1,0 +1,144 @@
+version: '3.7'
+
+secrets:
+
+  # Find your registration token at: "Your project" > "Settings" > "CI/CD" > "Runners settings" > "Specific Runners" (look for registration token)
+  # Register it as `GITLAB_REGISTRATION_TOKEN`: `docker secret create GITLAB_REGISTRATION_TOKEN YOUR_REGISTRATION_TOKEN`
+  GITLAB_REGISTRATION_TOKEN:
+    external: true
+  # Find your personal access token at: "Your user account" > "Settings" > "Access Tokens" > "Create personal access token" (for api)
+  # Register it as `GITLAB_PERSONAL_ACCESS_TOKEN`: `docker secret create GITLAB_PERSONAL_ACCESS_TOKEN <YOUR ACCESS TOKEN>`
+  GITLAB_PERSONAL_ACCESS_TOKEN:
+    external: true
+
+networks:
+  gitlab_server_runner_network: ## Created by 'gitlab-server' stack
+    external: true
+
+services:
+
+  # Gitlab Runner - https://gitlab.com/gitlab-org/gitlab-runner
+  runner:
+    image: klud/gitlab-runner:alpine # ARM compatible image
+    environment:
+      - CONCURRENT=4
+      - REGISTER_LOCKED=1
+      - REGISTER_NON_INTERACTIVE=1
+      - RUNNER_EXECUTOR=docker
+      - DOCKER_IMAGE=alpine:latest
+      - DOCKER_VOLUMES=/var/run/docker.sock:/var/run/docker.sock
+      - RUNNER_NAME=docker
+      - API_URL=https://gitlab.int.belisleonline.com/api/v4
+      - CI_SERVER_URL=https://gitlab.int.belisleonline.com/ci
+    entrypoint: "bash"
+    secrets:
+      - GITLAB_REGISTRATION_TOKEN
+    command: |
+      -c '
+        set -e
+
+        export REGISTRATION_TOKEN="$$(cat /run/secrets/GITLAB_REGISTRATION_TOKEN)"
+        printf "REGISTRATION_TOKEN = ${REGISTRATION_TOKEN}"
+        printf "\\n"
+
+        printf "Registering runner...\\n"
+        gitlab-runner register --non-interactive --tag-list "local"
+        printf "\\n"
+
+        printf "List runners...\\n"
+        gitlab-runner list
+        printf "\\n"
+
+        printf "Manually editing runner configuration...\\n"
+        sed -i "s/^concurrent = .*/concurrent = $${CONCURRENT}/" /etc/gitlab-runner/config.toml
+        sed -i "/^\[session_server.*/a \  listen_address = \"0.0.0.0:8093\"\n\  advertise_address = \"raspi-swarm.home.local:8093\"" /etc/gitlab-runner/config.toml
+
+        printf "Running runner...\\n"
+        gitlab-runner run --user=gitlab-runner --working-directory=/home/gitlab-runner
+
+      '
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      mode: replicated
+      replicas: 1
+    ports:
+      - 8093:8093
+    networks:
+      - gitlab_server_runner_network
+    healthcheck:
+      test: ["CMD-SHELL", "gitlab-runner verify --name docker 2>&1 | grep -q \"is alive\""]
+      start_period: 10s
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+  # Gitlab Manager to unregister GitLab Runners
+  manager:
+    image: alpine:latest
+    environment:
+      - API_URL=https://gitlab.int.belisleonline.com/api/v4
+      - CI_SERVER_URL=https://gitlab.int.belisleonline.com/ci
+    secrets:
+      - GITLAB_PERSONAL_ACCESS_TOKEN
+    entrypoint: sh
+    command: |
+      -c '
+        set -e
+        printf "Installing dependencies...\\n"
+        apk --no-cache add curl jq
+        sleep 60
+        printf "\\n"
+
+        export PERSONAL_ACCESS_TOKEN="$$(cat /run/secrets/GITLAB_PERSONAL_ACCESS_TOKEN)"
+        while true; do
+          printf "Checking runners...\\n"
+          curl -sS --header "PRIVATE-TOKEN: $${PERSONAL_ACCESS_TOKEN}" "$${API_URL}/runners/all?per_page=100" | \
+          jq -c ".[] | select(\"online\"==.status) | .id" | \
+          while read RUNNER_ID; do
+            printf "Runner $${RUNNER_ID} is online\\n"
+          done
+          curl -sS --header "PRIVATE-TOKEN: $${PERSONAL_ACCESS_TOKEN}" "$${API_URL}/runners/all?per_page=100" | \
+          jq -c ".[] | select(\"online\"!=.status) | .id" | \
+          while read RUNNER_ID; do
+            printf "Deleting runner $${RUNNER_ID}...\\n"
+            curl -sS --request DELETE --header "PRIVATE-TOKEN: $${PERSONAL_ACCESS_TOKEN}" "$${API_URL}/runners/$${RUNNER_ID}"
+          done
+          printf "All offline runners deleted\\n"
+          printf "Waiting for 24 hours...\\n"
+          sleep 24h
+        done
+        printf "\\n"
+      '
+    deploy:
+      mode: replicated
+      replicas: 1
+    healthcheck:
+      test: ["CMD-SHELL", "command -v curl"]
+      start_period: 10s
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+  # NOT ARM COMPATIBLE
+  # Gitlab Runner Docker Cleanup - https://gitlab.com/gitlab-org/gitlab-runner-docker-cleanup
+  # cleaner:
+  #   image: quay.io/gitlab/gitlab-runner-docker-cleanup
+  #   environment:
+  #     - CHECK_PATH=/data
+  #     - LOW_FREE_SPACE=10G
+  #     - EXPECTED_FREE_SPACE=20G
+  #     - LOW_FREE_FILES_COUNT=1048576
+  #     - EXPECTED_FREE_FILES_COUNT=2097152
+  #     - USE_DF=1
+  #     - CHECK_INTERVAL=10s
+  #     - RETRY_INTERVAL=30s
+  #     - DEFAULT_TTL=60m
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - /data:/data
+  #   deploy:
+  #     restart_policy:
+  #       condition: any
+  #     labels:
+  #       - "traefik.enable=false"

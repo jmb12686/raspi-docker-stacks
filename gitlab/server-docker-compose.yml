@@ -3,6 +3,9 @@ version: "3.7"
 networks:
   caddy_internal_net:
     external: true
+  runner_network:
+    driver: overlay
+    attachable: true
 
 volumes:
     gitlab-data:
@@ -23,6 +26,7 @@ services:
     image: jmb12686/gitlab:12.9.2
     networks:
       - caddy_internal_net
+      - runner_network
     volumes:
       - gitlab-data:/var/opt/gitlab
       - gitlab-logs:/var/log/gitlab
@@ -59,13 +63,3 @@ services:
       timeout: 30s
       retries: 8
       start_period: 4m
-  gitlab-runner:
-    image: klud/gitlab-runner:alpine
-    ports:
-      - 8093:8093
-    volumes:
-      - gitlab-runner-config:/etc/gitlab-runner
-      - /var/run/docker.sock:/var/run/docker.sock
-    deploy:
-      mode: replicated
-      replicas: 1

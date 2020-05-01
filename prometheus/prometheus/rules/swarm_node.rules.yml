@@ -12,13 +12,13 @@ groups:
     annotations:
       description: Less than 2 pihole containers exist!  Check status of home DNS setup!
       summary: pihole container missing
-  - alert: less_than_7_nodes
-    expr: count(node_meta * on(instance) group_left(node_name) node_meta{node_id=~".+"}) < 7
+  - alert: less_than_6_nodes
+    expr: count(node_meta * on(instance) group_left(node_name) node_meta{node_id=~".+"}) < 6
     for: 5m
     labels:
       severity: error
     annotations:
-      description: Number of Swarm nodes is less than 7, check setup to maintain cluster health.
+      description: Number of Swarm nodes is less than 6, check setup to maintain cluster health.
       summary: Swarm node went down, check setup.
   - alert: less_than_3_swarm_managers
     expr: sum(swarm_node_manager) < 3

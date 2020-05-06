@@ -26,9 +26,9 @@ services:
       replicas: 1
       resources:
         limits:
-          memory: 1024M
+          memory: 1500M
         reservations:
-          memory: 1024M
+          memory: 1500M
   log-pipe:
     image: bash
     command: bash -c 'tail -F /unifi/log/*.log'

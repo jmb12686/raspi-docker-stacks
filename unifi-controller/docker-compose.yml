@@ -9,6 +9,7 @@ services:
       RUNAS_UID0: "false"
       UNIFI_UID: 1000
       UNIFI_GID: 1000
+      JVM_MAX_HEAP_SIZE: "375M"
     ports:
       - "3478:3478/udp" # STUN
       - "6789:6789/tcp" # Speed test
@@ -29,6 +30,7 @@ services:
           memory: 1500M
         reservations:
           memory: 1500M
+    stop_grace_period: 60s
   log-pipe:
     image: bash
     command: bash -c 'tail -F /unifi/log/*.log'

@@ -5,8 +5,10 @@ version: "3.7"
 services:
   pihole:
     # Pinned to arm/v7 digest for pihole/pihole:v4.4
-    image: pihole/pihole@sha256:8c172c4cf344232a137202811b0c13a0542551076798d7635ef5368f40d1fe71
-    hostname: "{{.Node.Hostname}}-{{.Task.ID}}"    
+    # image: pihole/pihole@sha256:8c172c4cf344232a137202811b0c13a0542551076798d7635ef5368f40d1fe71
+    # Pinned to digest pihole/pihole:v5.0
+    image: pihole/pihole@sha256:d586f1a05c2a81b224d2c30d33ab9081b8baa0471f87d900d55e6155ed89cb08
+    hostname: "{{.Node.Hostname}}-{{.Task.ID}}"
     deploy:
       replicas: 2
       update_config:
@@ -61,7 +63,7 @@ services:
     deploy:
       replicas: 2
       update_config:
-        delay: 30s    
+        delay: 30s
     ports:
       - target: 5053
         published: 5053

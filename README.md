@@ -6,7 +6,8 @@ A collection of Docker Stacks that I run on my home Raspberry Pi Docker Swarm cl
 * **portainer** - Docker Swarm cluster management UI.
 * **GitLab** - GitLab Omnibus deployment with GitLab CI/CD Runner.
 * **Elastic (ELK) Stack** - Logging aggregation, analysis, search, and visualization stack.  Comprised of **Elasticsearch**, **Kibana**, and **Filebeat**.
-
+* **Unifi Controller** -  Wireless network management software solution from Ubiquiti Networks for administration of Unifi network gear.
+  
 
 
 ## Setup and Install

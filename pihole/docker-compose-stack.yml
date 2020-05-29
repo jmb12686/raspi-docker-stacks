@@ -18,6 +18,10 @@ services:
           memory: 200M
         reservations:
           memory: 100M
+      # Temporarily disable deployment to Ubuntu 20.04 arm64 nodes due to bug https://github.com/pi-hole/docker-pi-hole/issues/593
+      placement:
+        constraints:
+          - "node.hostname!=raspberrypicharlie"
     # For DHCP it is recommended to remove these ports and instead add: network_mode: "host"
     ports:
       - target: 53

@@ -3,7 +3,7 @@ version: "3.7"
 services:
 
   elasticsearch:
-    image: jmb12686/elasticsearch:v7.4.1
+    image: jmb12686/elasticsearch:v7.7.0
     configs:
       - source: elastic_config
         target: /usr/share/elasticsearch/config/elasticsearch.yml
@@ -15,7 +15,7 @@ services:
     environment:
       ES_JAVA_OPTS: "-Xmx1500m -Xms1500m"
       ELASTIC_PASSWORD: changeme
-      discovery.type: single-node
+      # discovery.type: single-node
       TZ: America/New_York
     networks:
       - elk
@@ -55,7 +55,7 @@ services:
 
 
   kibana:
-    image: jmb12686/kibana:v7.4.1-elastalert-arm
+    image: jmb12686/kibana:v7.7.0
     # Do not publish ports - force access thru caddy_internal_net
     # ports:
     #   - 5601:5601
@@ -87,7 +87,7 @@ services:
             memory: 1024M
 
   filebeat:
-    image: jmb12686/filebeat:v7.4.1
+    image: jmb12686/filebeat:v7.7.0
     hostname: "{{.Node.Hostname}}"
     user: root
     networks:

@@ -3,7 +3,7 @@ version: "3.7"
 services:
 
   elasticsearch:
-    image: jmb12686/elasticsearch:v7.7.0
+    image: jmb12686/elasticsearch:v7.7.1
     configs:
       - source: elastic_config
         target: /usr/share/elasticsearch/config/elasticsearch.yml
@@ -55,7 +55,7 @@ services:
 
 
   kibana:
-    image: jmb12686/kibana:v7.7.0
+    image: jmb12686/kibana:v7.7.1
     # Do not publish ports - force access thru caddy_internal_net
     # ports:
     #   - 5601:5601
@@ -87,7 +87,7 @@ services:
             memory: 1024M
 
   filebeat:
-    image: jmb12686/filebeat:v7.7.0
+    image: jmb12686/filebeat:v7.7.1
     hostname: "{{.Node.Hostname}}"
     user: root
     networks:

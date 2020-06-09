@@ -1,4 +1,4 @@
-version: "3.7"
+version: "3.8"
 
 # https://github.com/pi-hole/docker-pi-hole/blob/master/README.md
 
@@ -22,6 +22,7 @@ services:
       placement:
         constraints:
           - "node.hostname!=raspberrypicharlie"
+        max_replicas_per_node: 1
     # For DHCP it is recommended to remove these ports and instead add: network_mode: "host"
     ports:
       - target: 53
@@ -66,6 +67,8 @@ services:
     image: crazymax/cloudflared@sha256:a5e7919d79d7e2b93d304c159e750c55fb26c4e000c9bb302dc06a2cc2b80530
     deploy:
       replicas: 2
+      placement:
+        max_replicas_per_node: 1
       update_config:
         delay: 30s
     ports:

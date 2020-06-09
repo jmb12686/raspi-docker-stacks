@@ -30,7 +30,7 @@ groups:
       summary: Swarm Manager Node went down, check cluster health.
   - alert: node_cpu_usage
     expr: 100 - (avg(irate(node_cpu_seconds_total{mode="idle"}[1m]) * ON(instance) GROUP_LEFT(node_name)
-      node_meta * 100) BY (node_name)) > 50
+      node_meta * 100) BY (node_name)) > 75
     for: 1m
     labels:
       severity: warning

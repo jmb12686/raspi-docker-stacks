@@ -1,0 +1,31 @@
+version: "3.7"
+secrets:
+  password:
+    file: ./password.txt
+services:
+  vscode-server:
+    image: linuxserver/code-server
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+      - DOCKER_MODS=linuxserver/mods:code-server-nodejs|linuxserver/mods:code-server-golang|linuxserver/mods:code-server-docker|linuxserver/mods:code-server-python3
+      - FILE__PASSWORD=/run/secrets/password #optional
+      - FILE__SUDO_PASSWORD=/run/secrets/password #optional
+      - PROXY_DOMAIN=code.int.belisleonline.com #optional
+    volumes:
+      - code-server-config:/config
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - caddy_internal_net
+    secrets:
+      - password      
+    # ports:
+    #   - 8888:8443
+networks:
+  caddy_internal_net:
+    external: true
+volumes:
+  code-server-config:
+    driver: glusterfs:latest
+    name: "shared-volume/vscode-server-config"

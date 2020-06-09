@@ -35,6 +35,18 @@ https://auth.int.belisleonline.com:443 {
         }
 }
 
+https://code.int.belisleonline.com:443 {
+    import ip-filter
+    import int-auth
+    errors stderr
+    log / stdout "{combined}"
+    tls jmb186@gmail.com
+    proxy / http://vscode-server:8443 {
+        transparent
+        websocket        
+    }
+}
+
 https://gitlab.int.belisleonline.com:443 {
     import ip-filter
     errors stderr

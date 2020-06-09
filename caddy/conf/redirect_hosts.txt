@@ -4,3 +4,4 @@ alertmanager.int.belisleonline.com
 grafana.int.belisleonline.com
 portainer.int.belisleonline.com
 unifi.int.belisleonline.com
+code.int.belisleonline.com

@@ -21,7 +21,7 @@ groups:
     expr: sum(rate(container_cpu_usage_seconds_total{container_label_com_docker_swarm_task_name=~".+"}[1m]))
       BY (container_label_com_docker_swarm_task_name, container_label_com_docker_swarm_node_id)
       * 100 > 200
-    for: 1m
+    for: 5m
     annotations:
       description: '{{ $labels.container_label_com_docker_swarm_task_name }} on ''{{
         $labels.container_label_com_docker_swarm_node_id }}'' CPU usage is at {{ humanize

@@ -12,14 +12,14 @@ secrets:
     external: true
 
 networks:
-  gitlab_server_runner_network: ## Created by 'gitlab-server' stack
+  gitlab-server_runner_network: ## Created by 'gitlab-server' stack
     external: true
 
 services:
 
   # Gitlab Runner - https://gitlab.com/gitlab-org/gitlab-runner
   runner:
-    image: klud/gitlab-runner:alpine # ARM compatible image
+    image: klud/gitlab-runner:13.1.0-alpine # ARM compatible image
     environment:
       - CONCURRENT=4
       - REGISTER_LOCKED=1
@@ -28,8 +28,8 @@ services:
       - DOCKER_IMAGE=alpine:latest
       - DOCKER_VOLUMES=/var/run/docker.sock:/var/run/docker.sock
       - RUNNER_NAME=docker
-      - API_URL=https://gitlab.int.belisleonline.com/api/v4
-      - CI_SERVER_URL=https://gitlab.int.belisleonline.com/ci
+      - API_URL=http://gitlab:80/api/v4
+      - CI_SERVER_URL=http://gitlab:80/ci
     entrypoint: "bash"
     secrets:
       - GITLAB_REGISTRATION_TOKEN
@@ -65,7 +65,7 @@ services:
     ports:
       - 8093:8093
     networks:
-      - gitlab_server_runner_network
+      - gitlab-server_runner_network
     healthcheck:
       test: ["CMD-SHELL", "gitlab-runner verify --name docker 2>&1 | grep -q \"is alive\""]
       start_period: 10s
@@ -77,8 +77,8 @@ services:
   manager:
     image: alpine:latest
     environment:
-      - API_URL=https://gitlab.int.belisleonline.com/api/v4
-      - CI_SERVER_URL=https://gitlab.int.belisleonline.com/ci
+      - API_URL=http://gitlab:80/api/v4
+      - CI_SERVER_URL=http://gitlab:80/ci
     secrets:
       - GITLAB_PERSONAL_ACCESS_TOKEN
     entrypoint: sh

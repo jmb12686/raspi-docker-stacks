@@ -8,7 +8,7 @@ services:
       - source: elastic_config
         target: /usr/share/elasticsearch/config/elasticsearch.yml
     volumes:
-      - elasticsearch-data:/usr/share/elasticsearch/data
+      - /mnt/ssd/elasticsearch-data:/usr/share/elasticsearch/data
       - elasticsearch-snapshot:/mnt/elasticsearch-snapshot
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
@@ -22,6 +22,9 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+      placement:
+        constraints:
+          - node.labels.ssd==true      
       resources:
         limits:
           memory: 2500M

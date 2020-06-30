@@ -46,7 +46,7 @@ configs:
 
 services:
   doh-status-probe:
-    image: prom/blackbox-exporter
+    image: prom/blackbox-exporter:v0.16.0
     networks:
       - net
     command:
@@ -235,7 +235,7 @@ services:
           - node.platform.arch == aarch64
       resources:
         limits:
-          memory: 2048M
-        reservations:
           memory: 1024M
+        reservations:
+          memory: 512M
     stop_grace_period: 60s

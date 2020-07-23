@@ -4,10 +4,8 @@ version: "3.8"
 
 services:
   pihole:
-    # Pinned to arm/v7 digest for pihole/pihole:v4.4
-    # image: pihole/pihole@sha256:8c172c4cf344232a137202811b0c13a0542551076798d7635ef5368f40d1fe71
-    # Pinned to digest pihole/pihole:v5.0
-    image: pihole/pihole@sha256:d586f1a05c2a81b224d2c30d33ab9081b8baa0471f87d900d55e6155ed89cb08
+    # Pinned to arm/v7 digest pihole/pihole:v5.1.1
+    image: pihole/pihole@sha256:f26dc1beaec171b2e53e107643fb2ea7dfbb0afea0e9572671d6737b986a8870
     hostname: "{{.Node.Hostname}}-{{.Task.ID}}"
     deploy:
       replicas: 2
@@ -63,8 +61,8 @@ services:
       - "1.1.1.1" # fallback
 
   cloudflared:
-    # Pinned to arm/v7 digest for crazymax/cloudflared:2020.2.0
-    image: crazymax/cloudflared@sha256:a5e7919d79d7e2b93d304c159e750c55fb26c4e000c9bb302dc06a2cc2b80530
+    # Pinned to arm/v7 digest for crazymax/cloudflared:2020.7.4
+    image: crazymax/cloudflared@sha256:84be412b20d462cad62a34efd417f5ed5edc546e97ac2a2c8094c2556031daff
     deploy:
       replicas: 2
       placement:

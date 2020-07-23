@@ -1,4 +1,7 @@
 # RaspberryPi Docker Swarm Stacks
+
+![Custom badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fhealthchecks.io%2Fbadge%2F60ea1ee3-cc42-4799-9a68-e08d81%2FlrujVX8j.shields)
+
 A collection of Docker Stacks that I run on my home Raspberry Pi Docker Swarm cluster.
 
 * **Prometheus** - Full metrics and monitoring pipeline.  Includes Docker, container, and node based metric collection, alerting, and visualization w/ **Grafana**
